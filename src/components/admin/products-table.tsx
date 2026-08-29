@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, Pencil, EyeOff, Eye } from "lucide-react";
 
-import type { ProductRow } from "@/types";
+import { PRODUCT_CATEGORY_LABELS, type ProductRow } from "@/types";
 import { formatPrice } from "@/lib/format";
 import { setProductActive } from "@/app/admin/(panel)/products/actions";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead>Název</TableHead>
+              <TableHead className="hidden sm:table-cell">Kategorie</TableHead>
               <TableHead>Základní cena</TableHead>
               <TableHead>Stav</TableHead>
               <TableHead className="hidden sm:table-cell">Vytvořeno</TableHead>
@@ -62,7 +63,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
             {products.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={5}
+                  colSpan={6}
                   className="text-muted-foreground py-10 text-center text-sm"
                 >
                   Zatím žádné produkty. Přidej první pomocí tlačítka výše.
@@ -79,6 +80,9 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                     <div className="text-muted-foreground text-xs font-normal">
                       /{p.slug ?? "—"}
                     </div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground hidden text-sm sm:table-cell">
+                    {PRODUCT_CATEGORY_LABELS[p.category]}
                   </TableCell>
                   <TableCell>{formatPrice(p.base_price)}</TableCell>
                   <TableCell>

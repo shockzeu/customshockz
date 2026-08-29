@@ -6,7 +6,7 @@ import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/motion/reveal";
 
 export async function Featured() {
-  const products = await getActiveProducts(6);
+  const products = await getActiveProducts({ limit: 6 });
 
   if (products.length === 0) return null;
 
@@ -22,7 +22,7 @@ export async function Featured() {
           </p>
         </div>
         <Button asChild variant="ghost" className="hidden sm:inline-flex">
-          <Link href="/kolekce">Vše →</Link>
+          <Link href="/hodinky">Vše →</Link>
         </Button>
       </Reveal>
 

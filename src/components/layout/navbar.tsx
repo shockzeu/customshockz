@@ -17,6 +17,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/layout/logo";
+import { CartSheet } from "@/components/cart/cart-sheet";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -49,8 +50,10 @@ export function Navbar() {
 
         <div className="flex items-center gap-2">
           <Button asChild className="hidden md:inline-flex">
-            <Link href="/kolekce">Nakupovat</Link>
+            <Link href="/hodinky">Nakupovat</Link>
           </Button>
+
+          <CartSheet />
 
           {/* Mobile menu */}
           <Sheet open={open} onOpenChange={setOpen}>
@@ -85,7 +88,7 @@ export function Navbar() {
                 ))}
                 <SheetClose asChild>
                   <Button asChild className="mt-4 w-full">
-                    <Link href="/kolekce">Nakupovat</Link>
+                    <Link href="/hodinky">Nakupovat</Link>
                   </Button>
                 </SheetClose>
               </nav>

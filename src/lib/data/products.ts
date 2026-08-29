@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Product, ProductRow } from "@/types";
+import type { Product, ProductCategory, ProductRow } from "@/types";
 
 function toProduct(row: ProductRow): Product {
   return {
@@ -11,11 +11,20 @@ function toProduct(row: ProductRow): Product {
     description: row.description ?? "",
     imageUrl: row.image_url,
     inStock: row.in_stock,
+    category: row.category ?? "watches",
   };
 }
 
+type ActiveProductsOptions = {
+  limit?: number;
+  /** Restrict to one category, or an array of categories. */
+  category?: ProductCategory | ProductCategory[];
+};
+
 /** Active products for the public storefront, newest first. */
-export async function getActiveProducts(limit?: number): Promise<Product[]> {
+export async function getActiveProducts(
+  options: ActiveProductsOptions = {},
+): Promise<Product[]> {
   const supabase = await createClient();
   let query = supabase
     .from("products")
@@ -23,7 +32,12 @@ export async function getActiveProducts(limit?: number): Promise<Product[]> {
     .eq("is_active", true)
     .order("created_at", { ascending: false });
 
-  if (limit) query = query.limit(limit);
+  if (options.category) {
+    query = Array.isArray(options.category)
+      ? query.in("category", options.category)
+      : query.eq("category", options.category);
+  }
+  if (options.limit) query = query.limit(options.limit);
 
   const { data, error } = await query;
   if (error || !data) return [];

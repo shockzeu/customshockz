@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Watch, Palette } from "lucide-react";
+import { LayoutDashboard, Watch, Palette, ShoppingBag } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const links = [
   { title: "Přehled", href: "/admin", icon: LayoutDashboard, exact: true },
+  { title: "Objednávky", href: "/admin/orders", icon: ShoppingBag },
   { title: "Produkty", href: "/admin/products", icon: Watch },
   { title: "Varianty dílů", href: "/admin/parts", icon: Palette },
 ];

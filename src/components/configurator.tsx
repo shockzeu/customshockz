@@ -1,27 +1,33 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import { PART_TYPES, PART_TYPE_LABELS, type PartVariantRow } from "@/types";
-import { siteConfig } from "@/config/site";
+import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Props = {
+  productSlug: string | null;
   productName: string;
+  imageUrl: string | null;
   basePriceCzk: number;
   partsByType: Record<string, PartVariantRow[]>;
   inStock: boolean;
 };
 
 export function Configurator({
+  productSlug,
   productName,
+  imageUrl,
   basePriceCzk,
   partsByType,
   inStock,
 }: Props) {
+  const { addItem } = useCart();
   const activeTypes = PART_TYPES.filter(
     (t) => (partsByType[t]?.length ?? 0) > 0,
   );
@@ -43,19 +49,30 @@ export function Configurator({
   const totalCzk =
     basePriceCzk + selectedRows.reduce((sum, v) => sum + v.price_modifier, 0);
 
-  function orderMailto() {
-    const lines = [
-      `Chtěl(a) bych objednat: ${productName}`,
-      "",
-      ...selectedRows.map(
-        (v) => `${PART_TYPE_LABELS[v.part_type]}: ${v.label}`,
-      ),
-      "",
-      `Celková cena: ${formatPrice(totalCzk)}`,
-    ];
-    const subject = encodeURIComponent(`Objednávka — ${productName}`);
-    const body = encodeURIComponent(lines.join("\n"));
-    return `mailto:${siteConfig.email}?subject=${subject}&body=${body}`;
+  function handleAddToCart() {
+    const configSummary = selectedRows.map(
+      (v) => `${PART_TYPE_LABELS[v.part_type]}: ${v.label}`,
+    );
+    const key = `${productSlug ?? "custom"}::${selectedRows.map((v) => v.id).join(",")}`;
+
+    addItem({
+      key,
+      productSlug,
+      name: productName,
+      imageUrl,
+      unitPriceCzk: totalCzk,
+      configSummary,
+    });
+    toast.success("Přidáno do košíku");
+  }
+
+  if (activeTypes.length === 0) {
+    return (
+      <p className="text-muted-foreground border-border/60 rounded-lg border border-dashed p-6 text-sm">
+        Zatím tu nemáme žádné díly k výběru — napiš nám přímo a domluvíme
+        se na konfiguraci.
+      </p>
+    );
   }
 
   return (
@@ -114,16 +131,10 @@ export function Configurator({
             {formatPrice(totalCzk)}
           </p>
         </div>
-        <Button asChild size="lg" disabled={!inStock}>
-          <a href={orderMailto()}>
-            {inStock ? "Objednat" : "Vyprodáno"}
-          </a>
+        <Button size="lg" disabled={!inStock} onClick={handleAddToCart}>
+          {inStock ? "Přidat do košíku" : "Vyprodáno"}
         </Button>
       </div>
-      <p className="text-muted-foreground text-xs">
-        Platby kartou online (Stripe) se připravují — objednávka teď odešle
-        e-mail s tvou konfigurací a domluvíme se na platbě.
-      </p>
     </div>
   );
 }

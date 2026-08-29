@@ -3,10 +3,12 @@
 import { revalidatePath } from "next/cache";
 
 import { createClient } from "@/lib/supabase/server";
+import type { ProductCategory } from "@/types";
 
 export type ProductInput = {
   id?: string;
   name: string;
+  category: ProductCategory;
   slug: string;
   description: string;
   imageUrl: string | null;
@@ -36,6 +38,7 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
 
     const payload = {
       name: input.name.trim(),
+      category: input.category,
       slug,
       description: input.description.trim() || null,
       image_url: input.imageUrl,
@@ -53,7 +56,8 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
     revalidatePath("/admin/products");
     revalidatePath("/admin");
     revalidatePath("/");
-    revalidatePath("/kolekce");
+    revalidatePath("/hodinky");
+    revalidatePath("/sperky");
     revalidatePath(`/produkt/${slug}`);
     return {};
   } catch (e) {
@@ -77,7 +81,8 @@ export async function setProductActive(
     revalidatePath("/admin/products");
     revalidatePath("/admin");
     revalidatePath("/");
-    revalidatePath("/kolekce");
+    revalidatePath("/hodinky");
+    revalidatePath("/sperky");
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Neznámá chyba" };

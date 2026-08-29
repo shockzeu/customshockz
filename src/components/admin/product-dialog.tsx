@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Upload, X } from "lucide-react";
 
-import type { ProductRow } from "@/types";
+import {
+  PRODUCT_CATEGORIES,
+  PRODUCT_CATEGORY_LABELS,
+  type ProductCategory,
+  type ProductRow,
+} from "@/types";
 import { saveProduct } from "@/app/admin/(panel)/products/actions";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -13,6 +18,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -45,6 +57,9 @@ export function ProductDialog({
 
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(product?.name ?? "");
+  const [category, setCategory] = useState<ProductCategory>(
+    product?.category ?? "watches",
+  );
   const [slug, setSlug] = useState(product?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(isEdit);
   const [description, setDescription] = useState(product?.description ?? "");
@@ -62,6 +77,7 @@ export function ProductDialog({
   function resetForNew() {
     if (!isEdit) {
       setName("");
+      setCategory("watches");
       setSlug("");
       setSlugTouched(false);
       setDescription("");
@@ -106,6 +122,7 @@ export function ProductDialog({
     const res = await saveProduct({
       id: product?.id,
       name,
+      category,
       slug: slug || slugify(name),
       description,
       imageUrl: finalImageUrl,
@@ -143,7 +160,7 @@ export function ProductDialog({
               {isEdit ? "Upravit produkt" : "Nový produkt"}
             </DialogTitle>
             <DialogDescription>
-              Základní model hodinek. Cena je v Kč.
+              Hodinky nebo šperk k prodeji. Cena je v Kč.
             </DialogDescription>
           </DialogHeader>
 
@@ -157,6 +174,25 @@ export function ProductDialog({
                 onChange={(e) => onNameChange(e.target.value)}
                 placeholder="Frostbite GA-2100"
               />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Kategorie</Label>
+              <Select
+                value={category}
+                onValueChange={(v) => setCategory(v as ProductCategory)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PRODUCT_CATEGORIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {PRODUCT_CATEGORY_LABELS[c]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid gap-2">

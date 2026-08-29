@@ -67,9 +67,7 @@ export function Hero() {
           className="font-heading max-w-4xl text-4xl font-extrabold tracking-tight uppercase sm:text-6xl md:text-7xl"
         >
           Tvůj G-Shock,{" "}
-          <span className="from-ice-blue to-ice text-glow-ice bg-gradient-to-r bg-clip-text text-transparent">
-            jako žádný jiný
-          </span>
+          <span className="text-ice-blue text-glow-ice">jako žádný jiný</span>
         </motion.h1>
 
         <motion.p
@@ -85,7 +83,7 @@ export function Hero() {
           className="mt-10 flex flex-col gap-3 sm:flex-row"
         >
           <Button asChild size="lg" className="min-w-44">
-            <Link href="/kolekce">Prohlédnout kolekci</Link>
+            <Link href="/hodinky">Prohlédnout hodinky</Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="min-w-44">
             <Link href="/na-miru">Zakázka na míru</Link>

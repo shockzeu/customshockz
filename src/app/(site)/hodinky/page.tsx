@@ -3,18 +3,18 @@ import { ProductCard } from "@/components/product-card";
 import { Reveal } from "@/components/motion/reveal";
 
 export const metadata = {
-  title: "Kolekce | CustomShockz",
+  title: "Hodinky | CustomShockz",
   description: "Aktuální kolekce iced-out custom G-Shock hodinek.",
 };
 
-export default async function KolekcePage() {
-  const products = await getActiveProducts();
+export default async function HodinkyPage() {
+  const products = await getActiveProducts({ category: "watches" });
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <Reveal className="mb-10">
         <h1 className="font-heading text-3xl font-bold tracking-tight uppercase sm:text-4xl">
-          Kolekce
+          Hodinky
         </h1>
         <p className="text-muted-foreground mt-2 max-w-xl text-sm">
           Každý kus je ručně dělaný originál. Co je vyprodané, se nevrací.

@@ -7,11 +7,12 @@ export const siteConfig = {
   tagline: "Iced Out Custom G-Shock",
   description:
     "Ručně upravené a iced-out custom G-Shock hodinky. Streetwear estetika, limitované kusy, každý kousek originál.",
-  // Update to the production domain before deploy.
-  url: "https://customshockz.com",
+  url: "https://customshockz.eu",
   instagram: "https://instagram.com/CustomShockz",
   instagramHandle: "@CustomShockz",
-  email: "info@customshockz.com",
+  email: "customshockzz@gmail.com",
+  /** Bank transfer target — shown to customers who pick that payment method. */
+  bankAccount: "112200621/5500",
 } as const;
 
 export type NavItem = {
@@ -21,7 +22,8 @@ export type NavItem = {
 
 /** Primary navigation — routes are placeholders wired up in later phases. */
 export const mainNav: NavItem[] = [
-  { title: "Kolekce", href: "/kolekce" },
+  { title: "Hodinky", href: "/hodinky" },
+  { title: "Šperky", href: "/sperky" },
   { title: "Na míru", href: "/na-miru" },
   { title: "O nás", href: "/o-nas" },
   { title: "Kontakt", href: "/kontakt" },
@@ -31,7 +33,8 @@ export const footerNav: { title: string; items: NavItem[] }[] = [
   {
     title: "Obchod",
     items: [
-      { title: "Kolekce", href: "/kolekce" },
+      { title: "Hodinky", href: "/hodinky" },
+      { title: "Šperky", href: "/sperky" },
       { title: "Zakázka na míru", href: "/na-miru" },
       { title: "Dárkové poukazy", href: "/poukazy" },
     ],
