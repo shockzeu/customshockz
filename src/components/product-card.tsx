@@ -44,6 +44,12 @@ export function ProductCard({ product }: { product: Product }) {
               </span>
             </>
           )}
+          {/* Diagonal light sweep on hover — off by default, no reserved space. */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 -translate-x-[120%] skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out-quart [@media(hover:hover)]:group-hover:translate-x-[120%]"
+          />
+
           <div className="absolute top-3 left-3 flex gap-2">
             {!product.inStock && <Badge variant="secondary">Vyprodáno</Badge>}
           </div>

@@ -29,9 +29,22 @@ const itemReduced = {
   show: { opacity: 1, transition: { duration: 0.3 } },
 } satisfies Variants;
 
+// Headline gets its own, slightly more dramatic entrance (blur-in + rise)
+// so the page-load moment reads as an intentional reveal, not just a fade.
+const headline = {
+  hidden: { opacity: 0, y: 28, filter: "blur(6px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.7, ease: EASE_OUT_QUART },
+  },
+} satisfies Variants;
+
 export function Hero() {
   const reduceMotion = useReducedMotion();
   const variant = reduceMotion ? itemReduced : item;
+  const headlineVariant = reduceMotion ? itemReduced : headline;
 
   return (
     <section className="relative overflow-hidden">
@@ -63,11 +76,11 @@ export function Hero() {
         </motion.p>
 
         <motion.h1
-          variants={variant}
+          variants={headlineVariant}
           className="font-heading max-w-4xl text-4xl font-extrabold tracking-tight uppercase sm:text-6xl md:text-7xl"
         >
           Tvůj G-Shock,{" "}
-          <span className="text-ice-blue text-glow-ice">jako žádný jiný</span>
+          <span className="text-glow-ice text-shimmer">jako žádný jiný</span>
         </motion.h1>
 
         <motion.p
