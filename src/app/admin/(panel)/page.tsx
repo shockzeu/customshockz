@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { Watch, Palette, ArrowRight, TriangleAlert } from "lucide-react";
+import { Watch, Palette, ArrowRight, TriangleAlert, ShoppingBag } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
+import { formatPrice } from "@/lib/format";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -13,22 +14,41 @@ export const metadata = {
 async function getStats() {
   try {
     const supabase = await createClient();
-    const [products, activeProducts, parts] = await Promise.all([
-      supabase.from("products").select("*", { count: "exact", head: true }),
-      supabase
-        .from("products")
-        .select("*", { count: "exact", head: true })
-        .eq("is_active", true),
-      supabase.from("part_variants").select("*", { count: "exact", head: true }),
-    ]);
+    const [products, activeProducts, parts, newOrders, orders] =
+      await Promise.all([
+        supabase.from("products").select("*", { count: "exact", head: true }),
+        supabase
+          .from("products")
+          .select("*", { count: "exact", head: true })
+          .eq("is_active", true),
+        supabase.from("part_variants").select("*", { count: "exact", head: true }),
+        supabase
+          .from("orders")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "new"),
+        supabase.from("orders").select("total_price"),
+      ]);
 
-    const error = products.error ?? activeProducts.error ?? parts.error;
+    const error =
+      products.error ??
+      activeProducts.error ??
+      parts.error ??
+      newOrders.error ??
+      orders.error;
     if (error) return { error: error.message };
+
+    const revenue = (orders.data ?? []).reduce(
+      (sum, o) => sum + (o.total_price as number),
+      0,
+    );
 
     return {
       products: products.count ?? 0,
       activeProducts: activeProducts.count ?? 0,
       parts: parts.count ?? 0,
+      newOrders: newOrders.count ?? 0,
+      totalOrders: orders.data?.length ?? 0,
+      revenue,
     };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Neznámá chyba" };
@@ -45,7 +65,7 @@ export default async function AdminDashboardPage() {
           Přehled
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Správa katalogu CustomShockz.
+          Správa katalogu a objednávek CustomShockz.
         </p>
       </div>
 
@@ -68,18 +88,39 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-3">
-          <StatCard label="Produkty celkem" value={stats.products} />
-          <StatCard label="Aktivní produkty" value={stats.activeProducts} />
-          <StatCard label="Varianty dílů" value={stats.parts} />
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard
+              label="Nové objednávky"
+              value={stats.newOrders}
+              highlight={stats.newOrders > 0}
+            />
+            <StatCard label="Objednávky celkem" value={stats.totalOrders} />
+            <StatCard
+              label="Tržby celkem"
+              value={formatPrice(stats.revenue)}
+            />
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <StatCard label="Produkty celkem" value={stats.products} />
+            <StatCard label="Aktivní produkty" value={stats.activeProducts} />
+            <StatCard label="Varianty dílů" value={stats.parts} />
+          </div>
+        </>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <ManageCard
+          href="/admin/orders"
+          title="Objednávky"
+          description="Kdo objednal, adresy, platba a stav vyřízení."
+          icon={<ShoppingBag className="size-5" />}
+        />
         <ManageCard
           href="/admin/products"
           title="Produkty"
-          description="Základní modely hodinek, ceny a dostupnost."
+          description="Hodinky i šperky, ceny a dostupnost."
           icon={<Watch className="size-5" />}
         />
         <ManageCard
@@ -93,9 +134,17 @@ export default async function AdminDashboardPage() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
+function StatCard({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: number | string;
+  highlight?: boolean;
+}) {
   return (
-    <Card>
+    <Card className={highlight ? "border-ice-blue/50" : undefined}>
       <CardHeader className="pb-2">
         <CardTitle className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
           {label}

@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { sendOrderEmails } from "@/lib/email";
 import type { CartItem, PaymentMethod } from "@/types";
 
 export type CreateOrderInput = {
@@ -71,6 +72,31 @@ export async function createOrder(
       .insert(itemsPayload);
 
     if (itemsError) return { error: itemsError.message };
+
+    // Best-effort — a missing/failed email must never fail the order itself.
+    try {
+      await sendOrderEmails({
+        orderId: order.id as string,
+        customerName: input.customerName.trim(),
+        email: input.email.trim(),
+        phone: input.phone.trim() || null,
+        addressStreet: input.addressStreet.trim(),
+        addressCity: input.addressCity.trim(),
+        addressZip: input.addressZip.trim(),
+        paymentMethod: input.paymentMethod,
+        note: input.note.trim() || null,
+        items: input.items.map((item) => ({
+          name: item.name,
+          configSummary:
+            item.configSummary.length > 0 ? item.configSummary.join(", ") : null,
+          quantity: item.quantity,
+          unitPriceCzk: item.unitPriceCzk,
+        })),
+        totalCzk: totalPrice,
+      });
+    } catch {
+      // Order is already saved — swallow email errors.
+    }
 
     return { orderId: order.id as string };
   } catch (e) {

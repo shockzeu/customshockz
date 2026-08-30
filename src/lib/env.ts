@@ -22,6 +22,11 @@ export const env = {
   stripeWebhookSecret: optional("STRIPE_WEBHOOK_SECRET"),
   stripePublishableKey: optional("NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"),
 
+  // Resend (order confirmation / notification emails)
+  resendApiKey: optional("RESEND_API_KEY"),
+  /** Verified sender — defaults to Resend's shared test domain until customshockz.eu is verified. */
+  emailFrom: optional("EMAIL_FROM") ?? "CustomShockz <onboarding@resend.dev>",
+
   // App
   siteUrl: optional("NEXT_PUBLIC_SITE_URL") ?? "http://localhost:3000",
 } as const;
