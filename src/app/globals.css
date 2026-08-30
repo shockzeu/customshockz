@@ -180,3 +180,20 @@
 @utility text-glow-ice {
   text-shadow: 0 0 24px rgba(125, 211, 252, 0.35);
 }
+
+/* Slow coin-flip for the logo mark: it turns a full 360° around its own  */
+/* vertical axis, so the artwork stays upright the whole way round. The   */
+/* reduced-motion block above stops it for users who limit movement.      */
+@keyframes logo-spin {
+  from {
+    transform: perspective(600px) rotateY(0deg);
+  }
+  to {
+    transform: perspective(600px) rotateY(360deg);
+  }
+}
+
+@utility animate-logo-spin {
+  animation: logo-spin 6s linear infinite;
+  backface-visibility: visible;
+}
