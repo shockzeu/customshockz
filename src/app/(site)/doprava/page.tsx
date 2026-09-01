@@ -30,9 +30,9 @@ export default function DopravaPage() {
         <section>
           <h2 className="text-ice text-lg font-semibold">Platba</h2>
           <p className="text-muted-foreground mt-2 text-sm leading-relaxed sm:text-base">
-            Platba probíhá online kartou při objednávce. U zakázek na
-            míru je možná i platba bankovním převodem po individuální
-            domluvě.
+            Platit můžeš bankovním převodem, nebo na dobírku při převzetí
+            zásilky. Platební údaje k převodu (číslo účtu a variabilní
+            symbol) ti pošleme e-mailem po odeslání objednávky.
           </p>
         </section>
       </Reveal>
