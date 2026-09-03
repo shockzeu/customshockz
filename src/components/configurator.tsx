@@ -18,6 +18,7 @@ type Props = {
   basePriceCzk: number;
   partsByType: Record<string, PartVariantRow[]>;
   inStock: boolean;
+  codAllowed: boolean;
 };
 
 export function Configurator({
@@ -27,6 +28,7 @@ export function Configurator({
   basePriceCzk,
   partsByType,
   inStock,
+  codAllowed,
 }: Props) {
   const { addItem } = useCart();
   const activeTypes = PART_TYPES.filter(
@@ -63,6 +65,7 @@ export function Configurator({
       imageUrl,
       unitPriceCzk: totalCzk,
       configSummary,
+      codAllowed,
     });
     toast.success("Přidáno do košíku");
   }
@@ -75,6 +78,7 @@ export function Configurator({
         imageUrl={imageUrl}
         priceCzk={basePriceCzk}
         inStock={inStock}
+        codAllowed={codAllowed}
       />
     );
   }

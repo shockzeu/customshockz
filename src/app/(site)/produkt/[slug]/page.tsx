@@ -73,6 +73,7 @@ export default async function ProductPage({
                 basePriceCzk={product.priceCzk}
                 partsByType={partsByType}
                 inStock={product.inStock}
+                codAllowed={product.codAllowed}
               />
             ) : (
               <SimpleOrderButton
@@ -81,6 +82,7 @@ export default async function ProductPage({
                 imageUrl={product.imageUrl}
                 priceCzk={product.priceCzk}
                 inStock={product.inStock}
+                codAllowed={product.codAllowed}
               />
             )}
           </div>

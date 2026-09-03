@@ -68,6 +68,7 @@ export function ProductDialog({
   );
   const [inStock, setInStock] = useState(product?.in_stock ?? true);
   const [active, setActive] = useState(product?.is_active ?? true);
+  const [codAllowed, setCodAllowed] = useState(product?.cod_allowed ?? false);
   const [imageUrl, setImageUrl] = useState<string | null>(
     product?.image_url ?? null,
   );
@@ -84,6 +85,7 @@ export function ProductDialog({
       setPrice("");
       setInStock(true);
       setActive(true);
+      setCodAllowed(false);
       setImageUrl(null);
       setFile(null);
       if (fileRef.current) fileRef.current.value = "";
@@ -129,6 +131,7 @@ export function ProductDialog({
       basePriceCzk: Number(price) || 0,
       inStock,
       isActive: active,
+      codAllowed,
     });
 
     setSaving(false);
@@ -283,6 +286,22 @@ export function ProductDialog({
                 id="p-instock"
                 checked={inStock}
                 onCheckedChange={setInStock}
+              />
+            </div>
+
+            <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2.5">
+              <div>
+                <Label htmlFor="p-cod" className="cursor-pointer">
+                  Povolit dobírku
+                </Label>
+                <p className="text-muted-foreground mt-0.5 text-xs">
+                  Vypnuto = jen platba předem. Doporučeno pro kusy na míru.
+                </p>
+              </div>
+              <Switch
+                id="p-cod"
+                checked={codAllowed}
+                onCheckedChange={setCodAllowed}
               />
             </div>
 

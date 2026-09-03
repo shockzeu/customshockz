@@ -12,6 +12,7 @@ function toProduct(row: ProductRow): Product {
     imageUrl: row.image_url,
     inStock: row.in_stock,
     category: row.category ?? "watches",
+    codAllowed: row.cod_allowed,
   };
 }
 

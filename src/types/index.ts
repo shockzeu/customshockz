@@ -22,6 +22,8 @@ export type Product = {
   imageUrl: string | null;
   inStock: boolean;
   category: ProductCategory;
+  /** Whether cash-on-delivery is allowed for this product — off by default for made-to-order pieces. */
+  codAllowed: boolean;
 };
 
 export type Collection = {
@@ -53,6 +55,7 @@ export type ProductRow = {
   base_price: number; // haléře (CZK * 100)
   in_stock: boolean;
   is_active: boolean;
+  cod_allowed: boolean;
   category: ProductCategory;
   created_at: string;
 };
@@ -106,6 +109,8 @@ export type CartItem = {
   quantity: number;
   /** Human-readable selected parts, e.g. "Pouzdro: Černá". Empty for non-configurable products. */
   configSummary: string[];
+  /** Carried over from the product so checkout can decide whether COD stays offered. */
+  codAllowed: boolean;
 };
 
 export type OrderRow = {

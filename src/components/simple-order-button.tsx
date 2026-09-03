@@ -12,6 +12,7 @@ type Props = {
   imageUrl: string | null;
   priceCzk: number;
   inStock: boolean;
+  codAllowed: boolean;
 };
 
 /** Add-to-cart CTA for products without a part configurator (e.g. jewelry). */
@@ -21,6 +22,7 @@ export function SimpleOrderButton({
   imageUrl,
   priceCzk,
   inStock,
+  codAllowed,
 }: Props) {
   const { addItem } = useCart();
 
@@ -32,6 +34,7 @@ export function SimpleOrderButton({
       imageUrl,
       unitPriceCzk: priceCzk,
       configSummary: [],
+      codAllowed,
     });
     toast.success("Přidáno do košíku");
   }

@@ -31,6 +31,16 @@ export default function PokladnaPage() {
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  // Cash on delivery risks unpaid custom/made-to-order pieces going
+  // unclaimed — only offer it when every item in the cart allows it.
+  const codAvailable = items.length > 0 && items.every((i) => i.codAllowed);
+  const availableMethods = PAYMENT_METHODS.filter(
+    (m) => m !== "cash_on_delivery" || codAvailable,
+  );
+  const effectivePaymentMethod = availableMethods.includes(paymentMethod)
+    ? paymentMethod
+    : "bank_transfer";
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
@@ -42,7 +52,7 @@ export default function PokladnaPage() {
       addressStreet,
       addressCity,
       addressZip,
-      paymentMethod,
+      paymentMethod: effectivePaymentMethod,
       note,
       items,
     });
@@ -55,7 +65,7 @@ export default function PokladnaPage() {
     }
 
     clear();
-    const params = new URLSearchParams({ platba: paymentMethod });
+    const params = new URLSearchParams({ platba: effectivePaymentMethod });
     if (res.orderNumber) params.set("cislo", String(res.orderNumber));
     router.push(`/objednavka-dokoncena?${params.toString()}`);
   }
@@ -159,14 +169,14 @@ export default function PokladnaPage() {
             <div className="grid gap-2">
               <Label>Způsob platby</Label>
               <div className="grid gap-2 sm:grid-cols-2">
-                {PAYMENT_METHODS.map((method) => (
+                {availableMethods.map((method) => (
                   <button
                     key={method}
                     type="button"
                     onClick={() => setPaymentMethod(method)}
                     className={cn(
                       "rounded-lg border px-4 py-3 text-left text-sm transition-colors",
-                      paymentMethod === method
+                      effectivePaymentMethod === method
                         ? "border-ice-blue bg-ice-blue/10 text-foreground"
                         : "border-border/60 text-muted-foreground hover:border-border hover:text-foreground",
                     )}

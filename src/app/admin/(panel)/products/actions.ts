@@ -15,6 +15,7 @@ export type ProductInput = {
   basePriceCzk: number; // whole CZK from the form
   inStock: boolean;
   isActive: boolean;
+  codAllowed: boolean;
 };
 
 type ActionResult = { error?: string };
@@ -45,6 +46,7 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
       base_price: Math.round(input.basePriceCzk * 100), // → haléře
       in_stock: input.inStock,
       is_active: input.isActive,
+      cod_allowed: input.codAllowed,
     };
 
     const res = input.id

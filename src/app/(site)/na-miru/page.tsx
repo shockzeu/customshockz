@@ -32,6 +32,7 @@ export default async function NaMiruPage() {
           basePriceCzk={0}
           partsByType={partsByType}
           inStock
+          codAllowed={false}
         />
       </div>
 
