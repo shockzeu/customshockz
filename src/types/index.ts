@@ -57,6 +57,8 @@ export type ProductRow = {
   is_active: boolean;
   cod_allowed: boolean;
   category: ProductCategory;
+  /** Groups draft products created together so they can be published all at once. Null = not part of a batch. */
+  batch: string | null;
   created_at: string;
 };
 
