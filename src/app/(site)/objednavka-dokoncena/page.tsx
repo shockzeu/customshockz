@@ -51,12 +51,14 @@ export default async function ObjednavkaDokoncenaPage({
             )}
             <br />
             Přesnou částku k platbě ti pro jistotu ještě pošleme e-mailem
-            spolu s potvrzením objednávky.
+            spolu s potvrzením objednávky. Jakmile platba dorazí na účet,
+            rovnou začneme objednávku zpracovávat.
           </p>
         )}
         {paymentMethod === "cash_on_delivery" && (
           <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-            Zaplatíš při převzetí zásilky kurýrovi nebo na poště.
+            Zaplatíš při převzetí zásilky kurýrovi nebo na poště. Objednávku
+            začneme zpracovávat hned teď.
           </p>
         )}
       </div>

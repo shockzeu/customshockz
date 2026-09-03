@@ -73,8 +73,9 @@ export async function sendOrderEmails(input: OrderEmailInput) {
         input.paymentMethod === "bank_transfer"
           ? `<p>Číslo účtu: <strong>${siteConfig.bankAccount}</strong><br>
              Variabilní symbol: <strong>${variableSymbol}</strong><br>
-             Částka: <strong>${formatPrice(input.totalCzk)}</strong></p>`
-          : ""
+             Částka: <strong>${formatPrice(input.totalCzk)}</strong></p>
+             <p>Jakmile platba dorazí na účet, rovnou začneme objednávku zpracovávat.</p>`
+          : `<p>Objednávku začínáme zpracovávat hned teď.</p>`
       }
       <p style="margin-top:24px;color:#888;font-size:12px;">Objednávka č. ${input.orderNumber} (#${shortId})</p>
     </div>
