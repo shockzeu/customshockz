@@ -65,7 +65,9 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <p className="font-semibold">{order.customer_name}</p>
+                  <p className="font-semibold">
+                    #{order.order_number} — {order.customer_name}
+                  </p>
                   <Badge variant={STATUS_BADGE_VARIANT[order.status]}>
                     {ORDER_STATUS_LABELS[order.status]}
                   </Badge>

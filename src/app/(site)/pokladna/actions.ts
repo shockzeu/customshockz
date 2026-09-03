@@ -16,7 +16,11 @@ export type CreateOrderInput = {
   items: CartItem[];
 };
 
-type CreateOrderResult = { error?: string; orderId?: string };
+type CreateOrderResult = {
+  error?: string;
+  orderId?: string;
+  orderNumber?: number;
+};
 
 export async function createOrder(
   input: CreateOrderInput,
@@ -49,7 +53,7 @@ export async function createOrder(
         note: input.note.trim() || null,
         total_price: totalPrice,
       })
-      .select("id")
+      .select("id, order_number")
       .single();
 
     if (orderError || !order) {
@@ -77,6 +81,7 @@ export async function createOrder(
     try {
       await sendOrderEmails({
         orderId: order.id as string,
+        orderNumber: order.order_number as number,
         customerName: input.customerName.trim(),
         email: input.email.trim(),
         phone: input.phone.trim() || null,
@@ -98,7 +103,10 @@ export async function createOrder(
       // Order is already saved — swallow email errors.
     }
 
-    return { orderId: order.id as string };
+    return {
+      orderId: order.id as string,
+      orderNumber: order.order_number as number,
+    };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Neznámá chyba" };
   }

@@ -55,7 +55,9 @@ export default function PokladnaPage() {
     }
 
     clear();
-    router.push(`/objednavka-dokoncena?platba=${paymentMethod}`);
+    const params = new URLSearchParams({ platba: paymentMethod });
+    if (res.orderNumber) params.set("cislo", String(res.orderNumber));
+    router.push(`/objednavka-dokoncena?${params.toString()}`);
   }
 
   if (items.length === 0) {

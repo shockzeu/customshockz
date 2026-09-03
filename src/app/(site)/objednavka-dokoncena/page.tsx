@@ -11,9 +11,9 @@ export const metadata = {
 export default async function ObjednavkaDokoncenaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ platba?: string }>;
+  searchParams: Promise<{ platba?: string; cislo?: string }>;
 }) {
-  const { platba } = await searchParams;
+  const { platba, cislo } = await searchParams;
   const paymentMethod = (
     platba === "cash_on_delivery" ? "cash_on_delivery" : "bank_transfer"
   ) as PaymentMethod;
@@ -21,7 +21,7 @@ export default async function ObjednavkaDokoncenaPage({
   return (
     <div className="mx-auto w-full max-w-xl px-4 py-24 text-center sm:px-6 lg:px-8">
       <h1 className="font-heading text-3xl font-bold tracking-tight uppercase sm:text-4xl">
-        Díky za objednávku!
+        Děkujeme za objednávku!
       </h1>
       <p className="text-muted-foreground mt-4 text-base sm:text-lg">
         Přijali jsme ji a ozveme se ti co nejdřív na e-mail s potvrzením a
@@ -42,8 +42,16 @@ export default async function ObjednavkaDokoncenaPage({
             <span className="text-foreground font-medium">
               {siteConfig.bankAccount}
             </span>
-            . Platební údaje (částku a variabilní symbol) ti pošleme
-            e-mailem po potvrzení objednávky.
+            {cislo && (
+              <>
+                <br />
+                Variabilní symbol:{" "}
+                <span className="text-foreground font-medium">{cislo}</span>
+              </>
+            )}
+            <br />
+            Přesnou částku k platbě ti pro jistotu ještě pošleme e-mailem
+            spolu s potvrzením objednávky.
           </p>
         )}
         {paymentMethod === "cash_on_delivery" && (

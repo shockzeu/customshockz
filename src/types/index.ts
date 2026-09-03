@@ -110,6 +110,8 @@ export type CartItem = {
 
 export type OrderRow = {
   id: string;
+  /** Sequential, human-readable order number — also used as the bank-transfer variable symbol. */
+  order_number: number;
   customer_name: string;
   email: string;
   phone: string | null;

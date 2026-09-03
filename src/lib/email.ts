@@ -16,6 +16,7 @@ type OrderEmailItem = {
 
 type OrderEmailInput = {
   orderId: string;
+  orderNumber: number;
   customerName: string;
   email: string;
   phone: string | null;
@@ -58,6 +59,7 @@ export async function sendOrderEmails(input: OrderEmailInput) {
 
   const shortId = input.orderId.slice(0, 8);
   const itemsTable = itemsTableHtml(input.items);
+  const variableSymbol = String(input.orderNumber);
   const paymentLabel = PAYMENT_METHOD_LABELS[input.paymentMethod];
 
   const customerHtml = `
@@ -69,16 +71,18 @@ export async function sendOrderEmails(input: OrderEmailInput) {
       <p>Způsob platby: ${paymentLabel}</p>
       ${
         input.paymentMethod === "bank_transfer"
-          ? `<p>Číslo účtu: <strong>${siteConfig.bankAccount}</strong> — částku a variabilní symbol upřesníme e-mailem.</p>`
+          ? `<p>Číslo účtu: <strong>${siteConfig.bankAccount}</strong><br>
+             Variabilní symbol: <strong>${variableSymbol}</strong><br>
+             Částka: <strong>${formatPrice(input.totalCzk)}</strong></p>`
           : ""
       }
-      <p style="margin-top:24px;color:#888;font-size:12px;">Objednávka #${shortId}</p>
+      <p style="margin-top:24px;color:#888;font-size:12px;">Objednávka č. ${input.orderNumber} (#${shortId})</p>
     </div>
   `;
 
   const adminHtml = `
     <div style="font-family:-apple-system,sans-serif;max-width:480px;margin:0 auto;color:#111;">
-      <h2>Nová objednávka #${shortId}</h2>
+      <h2>Nová objednávka č. ${input.orderNumber}</h2>
       <p><strong>${input.customerName}</strong> — ${input.email}${input.phone ? ` · ${input.phone}` : ""}</p>
       <p>${input.addressStreet}, ${input.addressZip} ${input.addressCity}</p>
       <p>Platba: ${paymentLabel}</p>
@@ -98,7 +102,7 @@ export async function sendOrderEmails(input: OrderEmailInput) {
     resend.emails.send({
       from: env.emailFrom,
       to: siteConfig.email,
-      subject: `Nová objednávka od ${input.customerName}`,
+      subject: `Nová objednávka č. ${input.orderNumber} od ${input.customerName}`,
       html: adminHtml,
     }),
   ]);
