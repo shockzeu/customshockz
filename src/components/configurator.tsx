@@ -9,6 +9,7 @@ import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SimpleOrderButton } from "@/components/simple-order-button";
 
 type Props = {
   productSlug: string | null;
@@ -68,10 +69,20 @@ export function Configurator({
 
   if (activeTypes.length === 0) {
     return (
-      <p className="text-muted-foreground border-border/60 rounded-lg border border-dashed p-6 text-sm">
-        Zatím tu nemáme žádné díly k výběru — napiš nám přímo a domluvíme
-        se na konfiguraci.
-      </p>
+      <div className="space-y-4">
+        <p className="text-muted-foreground border-border/60 rounded-lg border border-dashed p-4 text-sm">
+          Vlastní konfiguraci dílů (barvy pouzdra, řemínku…) zatím
+          nenabízíme — kus si můžeš rovnou koupit v základním provedení,
+          nebo nám napiš a domluvíme se na úpravě na míru.
+        </p>
+        <SimpleOrderButton
+          productSlug={productSlug}
+          productName={productName}
+          imageUrl={imageUrl}
+          priceCzk={basePriceCzk}
+          inStock={inStock}
+        />
+      </div>
     );
   }
 
