@@ -69,20 +69,13 @@ export function Configurator({
 
   if (activeTypes.length === 0) {
     return (
-      <div className="space-y-4">
-        <p className="text-muted-foreground border-border/60 rounded-lg border border-dashed p-4 text-sm">
-          Vlastní konfiguraci dílů (barvy pouzdra, řemínku…) zatím
-          nenabízíme — kus si můžeš rovnou koupit v základním provedení,
-          nebo nám napiš a domluvíme se na úpravě na míru.
-        </p>
-        <SimpleOrderButton
-          productSlug={productSlug}
-          productName={productName}
-          imageUrl={imageUrl}
-          priceCzk={basePriceCzk}
-          inStock={inStock}
-        />
-      </div>
+      <SimpleOrderButton
+        productSlug={productSlug}
+        productName={productName}
+        imageUrl={imageUrl}
+        priceCzk={basePriceCzk}
+        inStock={inStock}
+      />
     );
   }
 
