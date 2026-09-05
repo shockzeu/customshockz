@@ -7,7 +7,7 @@ export const siteConfig = {
   tagline: "Iced Out Custom G-Shock",
   description:
     "Ručně upravené a iced-out custom G-Shock hodinky. Streetwear estetika, limitované kusy, každý kousek originál.",
-  url: "https://customshockz.eu",
+  url: "https://www.customshockz.eu",
   instagram: "https://instagram.com/CustomShockz",
   instagramHandle: "@CustomShockz",
   email: "customshockzz@gmail.com",
