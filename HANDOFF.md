@@ -32,10 +32,25 @@ Lukáš chce probrat a postavit lepší "custom builder" — pravděpodobně nav
 Konkrétní bezprostřední úkol, který zmínil:
 1. Pošle **odkaz na AliExpress** s kryty na hodinky (watch cases)
 2. Potřebuje z něj **vyscreenovat všechny kryty** (produktové fotky)
-3. Z nich udělat **"Scénu 1"** přes lokální ComfyUI pipeline — viz `[reference-customshockz-comfyui-ads.md]` v paměti: IC-Light + RMBG + DetailTransfer, runbook v `D:\AI\customshockz`, paleta Ice & Onyx
-4. **Důležité (feedback z paměti):** u produktových foto kompozic používat **plochý bezešvý podklad, ne 3D scénu s perspektivou stěny/podlahy** — viz `feedback-flat-backdrop-over-3d-scene.md`
+3. Z nich udělat produktové fotky přes **"Scénu 1"** — lokální ComfyUI pipeline, **NENÍ v tomhle repu**, žije na `D:\AI\customshockz\`
+4. **Důležité (feedback z paměti):** u produktových foto kompozic používat **plochý bezešvý podklad, ne 3D scénu s perspektivou stěny/podlahy**
 
-Cíl: mít čisté, jednotné fotky krytů jako podklad pro `part_variants` (case) v adminu / v konfigurátoru, než se probere finální podoba samotného builderu.
+### Co přesně je "Scéna 1"
+Předem vygenerované a schválené (2026-09-04) pozadí pro produktové fotky: plochý onyx černý
+backdrop s měkkou ledově modrou září, **žádná 3D perspektiva** (žádná zeď/podlaha/místnost) —
+soubor uložený natrvalo na `D:\AI\customshockz\scenes\scene1.png`. Je to defaultní/schválené
+pozadí pro úplně všechny produkty, dokud Lukáš neřekne jinak.
+
+Postup použití pro nový produkt (spouští se mimo tenhle repo, v `D:\AI\customshockz\`):
+```
+copy "D:\AI\customshockz\scenes\scene1.png" "D:\AI\ComfyUI_windows_portable\ComfyUI\input\scene1.png"
+D:\AI\ComfyUI_windows_portable\python_embeded\python.exe D:\AI\customshockz\run_on_bg.py <produkt.png> scene1.png <out_name> [scale_pct] [pos_y_pct]
+```
+- `produkt.png` = vyříznutá fotka produktu (musí být v `ComfyUI\input\`)
+- `run_on_bg.py` udělá RMBG cutout kompozici na `scene1.png` pozadí, včetně směrového nasvícení, měkkého ambientního stínu a jemného odrazu
+- Kompletní detaily (bug fixy, pravidlo "3 úhly na produkt" — rovný/zleva/zprava, zákaz rotace produktu, jen perspektivní zkos) jsou v `D:\AI\customshockz\RUNBOOK.md`
+
+Cíl: mít čisté, jednotné fotky krytů na Scéně 1 jako podklad pro `part_variants` (case) v adminu / v konfigurátoru, než se probere finální podoba samotného builderu.
 
 ## Priority dalších kroků
 1. **Custom builder** (viz sekce výše) — čerstvě rozjednáno, pokračovat v novém okně/session
