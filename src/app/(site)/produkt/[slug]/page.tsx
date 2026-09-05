@@ -1,12 +1,45 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { getProductBySlug } from "@/lib/data/products";
 import { getPartVariantsByType } from "@/lib/data/parts";
 import { formatPrice } from "@/lib/format";
+import { PRODUCT_CATEGORY_LABELS } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Configurator } from "@/components/configurator";
 import { SimpleOrderButton } from "@/components/simple-order-button";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
+  if (!product) return {};
+
+  const description =
+    product.description ||
+    `${PRODUCT_CATEGORY_LABELS[product.category]} od CustomShockz — ${formatPrice(product.priceCzk)}. Ručně upravené, iced-out, každý kus originál.`;
+
+  return {
+    title: product.name,
+    description,
+    openGraph: {
+      title: product.name,
+      description,
+      type: "website",
+      images: product.imageUrl ? [{ url: product.imageUrl }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: product.imageUrl ? [product.imageUrl] : undefined,
+    },
+  };
+}
 
 export default async function ProductPage({
   params,

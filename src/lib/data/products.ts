@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import type { Product, ProductCategory, ProductRow } from "@/types";
 
@@ -47,7 +49,9 @@ export async function getActiveProducts(
 }
 
 /** Single active product by slug, or null if not found / hidden. */
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export const getProductBySlug = cache(async (
+  slug: string,
+): Promise<Product | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("products")
@@ -58,4 +62,4 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 
   if (error || !data) return null;
   return toProduct(data as ProductRow);
-}
+});
