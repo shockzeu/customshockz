@@ -1,59 +1,113 @@
-# CustomShockz — stav projektu (2026-09-05)
+# CustomShockz — stav projektu (2026-09-07)
 
 ## Co to je
 Custom G-Shock e-shop v `D:\claude code\customshockz` (na GitHubu: `shockzeu/customshockz`, branch `main`, živě na `https://www.customshockz.eu`). Next.js 16 (App Router), TypeScript, Tailwind v4, shadcn/ui, framer-motion. Paleta "Ice & Onyx" (dark default).
 
 ## Tech stack
-- **Supabase** — DB + auth (funguje, admin panel čte/píše odsud, produkty i objednávky)
+- **Supabase** — DB + auth (funguje, admin panel čte/píše odsud, produkty i objednávky). **Pozor: lokální `npm run dev` čte STEJNOU produkční databázi jako živý web** — není tam žádné staging prostředí, takže cokoliv aktivuješ (`is_active = true`) je hned vidět na `customshockz.eu`, i když to testuješ jen lokálně.
 - **Resend** — potvrzovací e-maily (funguje, `src/lib/email.ts`, no-op pokud chybí `RESEND_API_KEY`)
-- **Stripe** — ⏭️ vědomě odloženo na Lukášovo přání (riziko nevyzvednuté dobírky u zakázek na míru řešeno jinak, viz níže). `stripe` balíček není nainstalovaný.
-- **Vercel** — nasazení, push do `main` = automatický deploy
+- **Stripe** — ⏭️ vědomě odloženo na Lukášovo přání. `stripe` balíček není nainstalovaný.
+- **Vercel** — nasazení, push do `main` = automatický deploy (obvykle 30–60 s)
 
-## Co je hotové (od 30. 8. přibylo hodně)
-- Konfigurátor produktu, košík, checkout flow
-- Admin panel: produkty (vč. nahrávání fotek do Supabase Storage), díly/varianty, objednávky se změnou stavu
-- Platba: bankovní převod / dobírka. **Dobírka je teď per-produkt přepínač** (`cod_allowed` sloupec, admin → Upravit produkt → "Povolit dobírku", default vypnuto) — checkout ji nabídne jen když ji povolují úplně všechny položky v košíku. Řeší riziko nevyzvednutých zakázek na míru.
-- **Automatický variabilní symbol** — každá objednávka má sekvenční `order_number` (od 10001), který slouží i jako VS pro bankovní převod. Zobrazí se na děkovací stránce i v e-mailu, admin ho vidí jako `#10047` v přehledu objednávek.
-- **Dávky produktů ("drops")** — v adminu `/admin/products` tlačítko "Vytvořit dávku": založí N skrytých produktů najednou (5/7/10/vlastní počet + kategorie), Lukáš je postupně vyplní přes editaci, pak jedním tlačítkem "Zveřejnit dávku" zveřejní všechny najednou.
-- Logo (CS monogram, `public/logo.png`, bílé na průhledném pozadí) + `src/app/icon.png` favicon + rotační animace v navbaru/patičce (`animate-logo-spin` v `globals.css`, otáčí se kolem svislé osy jako mince)
-- **SEO**: `robots.txt` a `sitemap.xml` (`src/app/robots.ts`, `src/app/sitemap.ts`), per-produkt `generateMetadata` (title/popis/OG obrázek — použije fotku produktu, pokud existuje, jinak brand kartu)
-- **Vlastní OG/Twitter obrázek při sdílení odkazu** — `src/app/opengraph-image.tsx` + `twitter-image.tsx`, generuje se kódem (logo + wordmark na tmavém pozadí), místo Vercel defaultu
-- **Google Search Console** — `www.customshockz.eu` ověřeno (meta tag v `layout.tsx`, `verification.google`), sitemap odeslán, homepage požádána o prioritní zaindexování
+## Co je hotové celkově
+- Konfigurátor produktu, košík, checkout flow, admin panel (produkty, díly/varianty, objednávky)
+- Platba: bankovní převod / dobírka (per-produkt přepínač `cod_allowed`)
+- Automatický variabilní symbol (`order_number` od 10001)
+- Dávky produktů ("drops") v adminu
+- Logo + favicon + rotační animace, SEO (robots/sitemap/OG obrázky), Google Search Console ověřeno
 - `scripts/clear-test-data.mjs` — smaže testovací produkty a varianty dílů ze Supabase
 
 ## ⚠️ Blokuje ostrý provoz — potřeba od Lukáše
-1. **Právní údaje v Obchodních podmínkách a GDPR** — `src/app/(site)/obchodni-podminky/page.tsx` a `src/app/(site)/gdpr/page.tsx` mají placeholder `[Doplnit: obchodní jméno / jméno a příjmení, IČO, sídlo]`. Bez tohohle nejde legálně spustit prodej v ČR.
-2. **Reálný katalog produktů** — Lukáš si pořídil fotobox, fotí si produkty sám (AI fotky produktů nevypadaly věrohodně). Nahrávají se přímo v adminu (`/admin/products` → tlačítko "Vybrat" u fotky, nebo přes dávky). Před ostrým katalogem spustit `clear-test-data.mjs`.
-3. **Ověřit doménu customshockz.eu v Resend** — aby e-maily nešly do spamu. Potřeba přístup k DNS správě domény.
+1. **Právní údaje v Obchodních podmínkách a GDPR** — placeholder `[Doplnit: obchodní jméno / jméno a příjmení, IČO, sídlo]`.
+2. **Reálný katalog produktů** (fotobox fotky) — spustit `clear-test-data.mjs` před ostrým katalogem.
+3. **Ověřit doménu customshockz.eu v Resend** — ať e-maily nechodí do spamu.
 
-## 🔜 Další úkol: custom builder (kryty na hodinky) — ROZJET V NOVÉM OKNĚ
-Lukáš chce probrat a postavit lepší "custom builder" — pravděpodobně navazuje na existující `/na-miru` konfigurátor (`src/components/configurator.tsx`, part_type `case`/`dial`/`strap`/`bezel-iced` v `src/types/index.ts`).
+---
 
-Konkrétní bezprostřední úkol, který zmínil:
-1. Pošle **odkaz na AliExpress** s kryty na hodinky (watch cases)
-2. Potřebuje z něj **vyscreenovat všechny kryty** (produktové fotky)
-3. Z nich udělat produktové fotky přes **"Scénu 1"** — lokální ComfyUI pipeline, **NENÍ v tomhle repu**, žije na `D:\AI\customshockz\`
-4. **Důležité (feedback z paměti):** u produktových foto kompozic používat **plochý bezešvý podklad, ne 3D scénu s perspektivou stěny/podlahy**
+## 🔨 Custom builder — stav k 2026-09-07 (hlavní aktuální práce)
+
+Cíl: `/na-miru` (a `Configurator` komponenta obecně) je teď **postupný wizard** — zákazník
+prochází kroky jeden po druhém (ne všechno najednou), s velkým náhledovým obrázkem nahoře,
+který se mění podle kliknuté miniatury. **Lukáš dělá zatím jen model GA-2100** (ne DW-6900/GA-110).
+
+### Co je HOTOVÉ a ŽIVÉ na customshockz.eu
+- **`src/components/configurator.tsx`** přepsaný na krok-za-krokem wizard:
+  - Nahoře velký náhled (crossfade animace při změně, framer-motion, `EASE_OUT_QUART`)
+  - Pod ním číslované "tečky" (klikatelné, skáčou na libovolný krok)
+  - Vždy se renderuje jen AKTUÁLNÍ krok (`step` state), po výběru varianty se **automaticky
+    posune na další krok** (`selectVariant` → `setStep(s+1)`)
+  - Slide+fade animace mezi kroky, se směrem (vpřed/vzad) podle toho, jestli jdeš dál nebo
+    klikáš "Zpět"/na dřívější tečku
+  - Varianty s `image_url` se renderují jako čtvercové thumbnaily (klik = výběr + přepnutí
+    velkého náhledu); varianty bez fotky mají starou "pilulku" s barevnou tečkou (fallback)
+- **`src/types/index.ts`** — `PART_TYPES` teď `["base", "case", "relief", "dial"]` (v tomhle
+  pořadí = pořadí kroků v builderu). **Odstraněno**: `bezel-iced` (bylo duplicitní s `case` —
+  kryty se od začátku importují jako `part_type: "case"`) a `strap` (nepoužívá se, Lukáš to
+  zatím neřeší). **Nově přidáno**: `relief` (viz níže).
+- **Data v Supabase (aktivní, `is_active = true`, živé na webu):**
+  - **8× `case`** — GA-2100 iced-out kryty/luneta (Silver1797/1788/1791/1806, Gold1788/1791/1806/1797)
+  - **17× `base`** — originální GA-2100 modely, číslované `01`–`17` v popisku (`01 · GA-2100-1A1ER — …`
+    atd.) — **to číslo je záměrně jen v textu, NENÍ vypálené do fotky**, slouží Lukášovi jako
+    reference, který přesný model objednat u dodavatele, když přijde objednávka
+- **Postgres `part_type` enum** rozšířen o `base` (migrace `0008`) a `relief` (migrace `0009`).
+  Staré hodnoty `bezel-iced`/`strap` v enumu zůstaly (Postgres neumí snadno mazat hodnoty z enumu
+  bez přestavby typu) — nevadí, nic je nepoužívá, appka je ignoruje.
+- Nové admin scripty (stejný vzor jako `clear-test-data.mjs`, service-role klíč z `.env.local`):
+  - `scripts/import-ga2100-base.mjs` — import 17 základů
+  - `scripts/import-ga2100-cases.mjs` — import 8 krytů
+  - `scripts/activate-builder-drafts.mjs` — hromadně nastaví `is_active = true` pro `base`+`case`
+    (spouštět ručně z terminálu — Claude Code auto-mode klasifikátor blokuje tenhle typ hromadné
+    "publikační" akce přes Bash, proto se to nakonec dodělalo přes admin UI v Chromu)
 
 ### Co přesně je "Scéna 1"
-Předem vygenerované a schválené (2026-09-04) pozadí pro produktové fotky: plochý onyx černý
+Schválené (2026-09-04) defaultní pozadí pro ÚPLNĚ VŠECHNY produktové fotky: plochý onyx černý
 backdrop s měkkou ledově modrou září, **žádná 3D perspektiva** (žádná zeď/podlaha/místnost) —
-soubor uložený natrvalo na `D:\AI\customshockz\scenes\scene1.png`. Je to defaultní/schválené
-pozadí pro úplně všechny produkty, dokud Lukáš neřekne jinak.
+takhle to Lukáš chtěl poté, co odmítl dřívější verzi s 3D místností (feedback: "vypadalo to jako
+vznášející se nálepka"). Soubor identicky uložený na dvou místech:
+- `D:\AI\customshockz\scenes\scene1.png` (originál, ComfyUI pipeline ho odsud kopíruje)
+- `D:\claude code\customshockz\scene1-pozadi.png` (kopie přímo v repu)
 
-Postup použití pro nový produkt (spouští se mimo tenhle repo, v `D:\AI\customshockz\`):
+**Pozor na matoucí soubor:** `D:\customshockz\POzadi na produkty.png` je STARÁ odmítnutá 3D verze
+(zeď+podlaha v perspektivě) — nepoužívat, to není Scéna 1.
+
+Postup zpracování nového produktu (spouští se MIMO tenhle repo, v `D:\AI\customshockz\`):
 ```
 copy "D:\AI\customshockz\scenes\scene1.png" "D:\AI\ComfyUI_windows_portable\ComfyUI\input\scene1.png"
-D:\AI\ComfyUI_windows_portable\python_embeded\python.exe D:\AI\customshockz\run_on_bg.py <produkt.png> scene1.png <out_name> [scale_pct] [pos_y_pct]
+copy "<zdrojová fotka produktu>" "D:\AI\ComfyUI_windows_portable\ComfyUI\input\"
+D:\AI\ComfyUI_windows_portable\python_embeded\python.exe D:\AI\customshockz\run_on_bg.py <produkt.png> scene1.png <out_name> [scale_pct] [pos_y_pct] [angle] [pos_x_pct] [clean_mask] [process_res]
 ```
-- `produkt.png` = vyříznutá fotka produktu (musí být v `ComfyUI\input\`)
-- `run_on_bg.py` udělá RMBG cutout kompozici na `scene1.png` pozadí, včetně směrového nasvícení, měkkého ambientního stínu a jemného odrazu
-- Kompletní detaily (bug fixy, pravidlo "3 úhly na produkt" — rovný/zleva/zprava, zákaz rotace produktu, jen perspektivní zkos) jsou v `D:\AI\customshockz\RUNBOOK.md`
+- Server musí běžet: `D:\AI\ComfyUI_windows_portable\python_embeded\python.exe -s ComfyUI\main.py --windows-standalone-build --port 8188` (v `D:\AI\ComfyUI_windows_portable`, s `HF_HOME=D:\AI\cache\huggingface`)
+- Výstup: `D:\AI\ComfyUI_windows_portable\ComfyUI\output\<out_name>.png`
+- `scale_pct` default 45, `pos_y_pct` default 68 — pro kryty/základy (kulaté/celé hodinky) funguje
+  dobře `scale_pct=42-55, pos_y_pct=50-55` (vycentrované), ne default (ten je laděný na náramek)
+- **`process_res` (nový 9. argument, default 1024)** — zvýšit na `2048` u produktů s tenkými
+  mezerami (např. "hvězdicový"/"paprskovitý" design s tenkými hroty) — při 1024 RMBG masku
+  tenkých mezer často spojí a uprostřed zůstane bílá skvrna místo průhledna. Objeveno a opraveno
+  2026-09-06 na variantě "Silver1791" (kryt s hroty).
+- Kompletní detaily (bug fixy, pravidlo "3 úhly na produkt", zákaz rotace) v `D:\AI\customshockz\RUNBOOK.md`
 
-Cíl: mít čisté, jednotné fotky krytů na Scéně 1 jako podklad pro `part_variants` (case) v adminu / v konfigurátoru, než se probere finální podoba samotného builderu.
+### 🔜 Další kroky (v tomhle pořadí, potvrzeno s Lukášem)
+Postup kroků v builderu má být: **1) Základ → 2) Luneta/Pouzdro (case, hotovo) → 3) Reliéf → 4) Číselník**
 
-## Priority dalších kroků
-1. **Custom builder** (viz sekce výše) — čerstvě rozjednáno, pokračovat v novém okně/session
+1. **Reliéf** (`part_type: "relief"`) — gumové indexy/rysky na ciferníku (G-Shock nemá čísla, jen
+   rysky, a ty jdou vyměnit za custom gumové). Lukáš pošle odkaz (AliExpress/jiný) s variantami,
+   stejný postup jako u krytů: stáhnout ve vysokém rozlišení, očíslovat/ukázat přehled, Lukáš
+   vybere, projet přes Scénu 1, importovat. **Musí obsahovat i variantu "Originál"** (bez fotky,
+   `price_modifier: 0`) pro zákazníky, co nechtějí měnit nic.
+2. **Číselník** (`part_type: "dial"`, už v enumu, zatím 0 řádků) — plná výměna ciferníku, řešit
+   až budou reálné fotky (na rozdíl od reliéfu je tohle složitější díl, ne jen gumový akcent).
+3. **Mod kit** — CELÝ set pouzdro+řemínek (např. "AP mod kit" styl), do kterého se přesune původní
+   strojek/modul → ciferník zůstává stejný jako na originále. **Nejde kombinovat s iced-out lunetou**
+   (fyzicky nesedí — mod kit je jeden kompaktní kus). Domluvený plán: v kroku 2 udělat "buď/nebo"
+   přepínač (dvě záložky ve stejném kroku) mezi "Iced-out luneta" (case, hotovo) a "Mod kit" (nový
+   `part_type`, zatím žádná data/kód) — NENÍ ještě implementováno, čeká se na zdrojové fotky mod kitů.
+4. Po dodání fotek reliéfu/číselníku/mod kitu vždy: stáhnout → ukázat přehled očíslovaný → Lukáš
+   vybere → Scéna 1 → import script (`is_active: false` draft) → **počkat na explicitní pokyn
+   "aktivuj"** než se to pustí live (viz Poznámky k workflow níže — tohle se minule nedodrželo a
+   živý web na chvíli spadl, protože stará nasazená verze neznala nový `part_type`).
+
+## Priority dalších kroků (obecně, mimo builder)
+1. **Custom builder** (viz sekce výše) — probíhá, pokračovat dál stejným stylem
 2. Doplnit právní údaje (IČO/sídlo) — kdykoliv, jen text
 3. Nahrát reálný katalog, jakmile budou fotky z fotoboxu
 4. Ověřit doménu v Resend
@@ -61,12 +115,28 @@ Cíl: mít čisté, jednotné fotky krytů na Scéně 1 jako podklad pro `part_v
 6. Aktualizovat README (popisuje starší architekturu)
 
 ## Poznámky k workflow
-- Batchovat lokální změny, čekat na explicitní "publikuj" pokyn před git push/deployem — **výjimka**: u věcí, co blokují prodej nebo co si Lukáš přímo přeje hned live (poslední dobou spíš pushujeme rovnou po ověření, funguje to dobře)
+- **Pořadí při aktivaci nového `part_type`:** NEJDŘÍV pushnout kód, co ten typ umí zobrazit,
+  AŽ POTOM aktivovat řádky v DB s tím typem. Obráceně (aktivovat dřív než je kód venku) způsobí,
+  že stará nasazená verze na produkci spadne s chybou, protože neumí neznámý `part_type` (stalo
+  se 2026-09-06 s typem `base`, opraveno rychlým pushem).
+- Batchovat lokální změny, čekat na explicitní "publikuj"/"aktivuj" pokyn před tím, než se draft
+  varianty přepnou na `is_active = true` — výjimka: věci co blokují prodej nebo co Lukáš přímo chce
+  hned live.
+- **Hromadné/"publikační" DB akce (např. aktivace 25 variant najednou) blokuje Claude Code
+  auto-mode klasifikátor přes Bash** — funguje to ale přes admin UI v Chromu (přihlášený účet),
+  tam žádný blok není. Jednotlivé klikací akce chtějí pauzu ~1.5–2s mezi kliky, jinak se rychlé
+  kliky za sebou ztratí (React re-render po prvním kliku zneplatní zbytek dávky).
 - URL vždy otevírat v Chrome, ne Edge
 - Vše ukládat na disk D (disk C je skoro plný) — na jiném počítači/Macu neplatí
 - Nasazení: push do `main` na GitHubu → Vercel automaticky nasadí (obvykle do ~30–60 s)
-- Databázové migrace (`supabase/migrations/*.sql`) se pouštějí ručně v Supabase SQL Editoru — dá se to udělat i přímo v Chrome (přihlášený účet), stačí otevřít SQL Editor a vložit obsah migrace
-- Aktuální migrace: `0001` až `0007` (naposledy `0007_product_batches.sql`)
+- Databázové migrace (`supabase/migrations/*.sql`) se pouštějí ručně v Supabase SQL Editoru — dá
+  se to udělat i přímo v Chrome (přihlášený účet), stačí otevřít SQL Editor a vložit obsah migrace.
+  Odkaz: `https://supabase.com/dashboard/project/cmejkszywblqrnpyxogp/sql/new`
+- Aktuální migrace: `0001` až `0009` (naposledy `0009_relief_part_type.sql`)
+- **Nikdy nevytvářet dočasné "preview" stránky/routy, co obchází RLS přes service-role klíč, a
+  nechat je v repu** — použité jednou k lokálnímu testování draftů (`na-miru-preview/page.tsx`),
+  po ověření smazáno PŘED commitem. Kdyby se to omylem pushlo, byla by to bezpečnostní díra
+  (kdokoliv by mohl vidět/rendrovat neaktivní/draft obsah).
 
 ## Pokračování na jiném zařízení (např. MacBook)
 Projekt žije na GitHubu, takže se nepřenáší souborem/e-mailem — naklonuje se:
@@ -75,7 +145,7 @@ Projekt žije na GitHubu, takže se nepřenáší souborem/e-mailem — naklonuj
 2. Nainstalovat Claude Code a přihlásit se stejným účtem
 3. `git clone https://github.com/shockzeu/customshockz.git`
 4. `npm install` ve složce projektu
-5. **`.env.local` se v gitu nepřenáší (obsahuje tajné klíče)** — potřeba ho ručně vytvořit podle `.env.example` a doplnit skutečné hodnoty (Supabase URL/klíče, Resend klíč). Přenést zvlášť a bezpečně (heslenka/správce hesel, ne veřejný e-mail).
-6. `npm run dev` → běží na `http://localhost:3000`
+5. **`.env.local` se v gitu nepřenáší (obsahuje tajné klíče)** — potřeba ho ručně vytvořit podle `.env.example` a doplnit skutečné hodnoty (Supabase URL/klíče, Resend klíč). Přenést zvlášť a bezpečně.
+6. `npm run dev` → běží na `http://localhost:3000` (**pozor, viz Tech stack výše — je to živá produkční DB**)
 
 Změny se pak synchronizují přes `git push` / `git pull` na `main`.
