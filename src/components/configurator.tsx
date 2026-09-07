@@ -65,8 +65,6 @@ export function Configurator({
   function selectVariant(type: string, variant: PartVariantRow) {
     setSelected((s) => ({ ...s, [type]: variant.id }));
     if (variant.image_url) setPreviewUrl(variant.image_url);
-    setDirection(1);
-    setStep((s) => Math.min(s + 1, lastStep));
   }
 
   const stepVariants = {
@@ -286,15 +284,24 @@ export function Configurator({
                 );
               })}
             </CardContent>
-            {step > 0 && (
-              <div className="px-6 pb-6">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => goToStep(step - 1)}
-                >
-                  ← Zpět
-                </Button>
+            {(step > 0 || step < lastStep) && (
+              <div className="flex items-center justify-between px-6 pb-6">
+                {step > 0 ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => goToStep(step - 1)}
+                  >
+                    ← Zpět
+                  </Button>
+                ) : (
+                  <span />
+                )}
+                {step < lastStep && (
+                  <Button size="sm" onClick={() => goToStep(step + 1)}>
+                    Pokračovat →
+                  </Button>
+                )}
               </div>
             )}
           </Card>
