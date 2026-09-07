@@ -35,25 +35,23 @@ export type Collection = {
 
 // ---------- Database rows (Supabase, Phase 2) ----------
 
-export const PART_TYPES = ["base", "bezel-iced", "case", "dial", "strap"] as const;
+export const PART_TYPES = ["base", "case", "relief", "dial"] as const;
 export type PartType = (typeof PART_TYPES)[number];
 
 /** Human labels for the part_type enum. */
 export const PART_TYPE_LABELS: Record<PartType, string> = {
   base: "Základ",
   case: "Pouzdro (case)",
+  relief: "Reliéf (indexy na ciferníku)",
   dial: "Číselník (dial)",
-  strap: "Řemínek (strap)",
-  "bezel-iced": "Iced-out luneta (bezel)",
 };
 
 /** Short helper line shown under each step's title in the builder. */
 export const PART_TYPE_STEP_HINTS: Record<PartType, string> = {
   base: "Vyber si originální G-Shock, na kterém stavíme.",
-  "bezel-iced": "Vyměň lunetu za vyloženou verzi s kamínky.",
   case: "Vyber si tvar a povrch pouzdra.",
+  relief: "Ponech originál, nebo vyměň gumové indexy za vlastní.",
   dial: "Ponech originál, nebo si vyber vlastní ciferník.",
-  strap: "Vyber si řemínek, který sedí ke zbytku.",
 };
 
 export type ProductRow = {
