@@ -35,7 +35,7 @@ export type Collection = {
 
 // ---------- Database rows (Supabase, Phase 2) ----------
 
-export const PART_TYPES = ["base", "case", "relief", "dial"] as const;
+export const PART_TYPES = ["base", "case", "dial", "relief"] as const;
 export type PartType = (typeof PART_TYPES)[number];
 
 /** Human labels for the part_type enum. */
