@@ -51,11 +51,22 @@ export function Configurator({
     ),
   );
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(imageUrl);
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const lastStep = activeTypes.length - 1;
   const reduceMotion = useReducedMotion();
+
+  // Show the current step's selected variant photo; if it has none (e.g. a
+  // draft part type with no photos yet), fall back to the nearest earlier
+  // step that does, then to the product's own image.
+  const previewUrl = useMemo(() => {
+    for (let i = step; i >= 0; i--) {
+      const t = activeTypes[i];
+      const variant = partsByType[t]?.find((v) => v.id === selected[t]);
+      if (variant?.image_url) return variant.image_url;
+    }
+    return imageUrl;
+  }, [step, activeTypes, partsByType, selected, imageUrl]);
 
   function goToStep(target: number) {
     setDirection(target >= step ? 1 : -1);
@@ -64,7 +75,6 @@ export function Configurator({
 
   function selectVariant(type: string, variant: PartVariantRow) {
     setSelected((s) => ({ ...s, [type]: variant.id }));
-    if (variant.image_url) setPreviewUrl(variant.image_url);
   }
 
   const stepVariants = {
