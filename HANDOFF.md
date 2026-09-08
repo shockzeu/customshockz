@@ -1,4 +1,12 @@
-# CustomShockz — stav projektu (2026-09-07)
+# CustomShockz — stav projektu (2026-09-08)
+
+## ▶️ Začni tady v nové session
+Řekni Claude Code: **"přečti si HANDOFF.md a pojďme pokračovat na custom builderu"** — všechno
+potřebné je v sekci **🔨 Custom builder** níže. Krátce: builder na `/na-miru` je živý a funkční
+(krok Základ → krok Pouzdro/luneta), další v pořadí je **Reliéf** (gumové rysky na ciferníku) —
+čeká se, až Lukáš pošle odkaz s variantami. Postup zpracování nových fotek (stáhnout → ukázat
+očíslovaný přehled → Lukáš vybere → Scéna 1 → import jako draft → **teprve po pokynu aktivovat**)
+je popsaný v sekci "Další kroky" níže — drž se ho přesně, ušetří to opravování chyb.
 
 ## Co to je
 Custom G-Shock e-shop v `D:\claude code\customshockz` (na GitHubu: `shockzeu/customshockz`, branch `main`, živě na `https://www.customshockz.eu`). Next.js 16 (App Router), TypeScript, Tailwind v4, shadcn/ui, framer-motion. Paleta "Ice & Onyx" (dark default).
@@ -34,12 +42,15 @@ který se mění podle kliknuté miniatury. **Lukáš dělá zatím jen model GA
 - **`src/components/configurator.tsx`** přepsaný na krok-za-krokem wizard:
   - Nahoře velký náhled (crossfade animace při změně, framer-motion, `EASE_OUT_QUART`)
   - Pod ním číslované "tečky" (klikatelné, skáčou na libovolný krok)
-  - Vždy se renderuje jen AKTUÁLNÍ krok (`step` state), po výběru varianty se **automaticky
-    posune na další krok** (`selectVariant` → `setStep(s+1)`)
+  - Vždy se renderuje jen AKTUÁLNÍ krok (`step` state)
   - Slide+fade animace mezi kroky, se směrem (vpřed/vzad) podle toho, jestli jdeš dál nebo
     klikáš "Zpět"/na dřívější tečku
-  - Varianty s `image_url` se renderují jako čtvercové thumbnaily (klik = výběr + přepnutí
-    velkého náhledu); varianty bez fotky mají starou "pilulku" s barevnou tečkou (fallback)
+  - Varianty s `image_url` se renderují jako čtvercové thumbnaily (klik = jen výběr + přepnutí
+    velkého náhledu, NEPŘESKAKUJE na další krok); varianty bez fotky mají starou "pilulku"
+    s barevnou tečkou (fallback)
+  - **Krok se posune jen po kliknutí na tlačítko "Pokračovat →"** (a zpět přes "← Zpět") —
+    zpočátku se posouvalo automaticky hned po výběru, Lukáš chtěl změnit, ať si lidi stihnou
+    projít všechny možnosti (např. všech 17 základů) předtím, než potvrdí.
 - **`src/types/index.ts`** — `PART_TYPES` teď `["base", "case", "relief", "dial"]` (v tomhle
   pořadí = pořadí kroků v builderu). **Odstraněno**: `bezel-iced` (bylo duplicitní s `case` —
   kryty se od začátku importují jako `part_type: "case"`) a `strap` (nepoužívá se, Lukáš to
@@ -58,6 +69,9 @@ který se mění podle kliknuté miniatury. **Lukáš dělá zatím jen model GA
   - `scripts/activate-builder-drafts.mjs` — hromadně nastaví `is_active = true` pro `base`+`case`
     (spouštět ručně z terminálu — Claude Code auto-mode klasifikátor blokuje tenhle typ hromadné
     "publikační" akce přes Bash, proto se to nakonec dodělalo přes admin UI v Chromu)
+  - `scripts/fix-ga2100-base-labels.mjs` — opravný skript, přepíše `label`+`hex_color` u všech 17
+    `base` řádků (spuštěno 2026-09-08, viz "Lekce" níže — dodatečně měnit popisky/barvy jde
+    stejným vzorem: `.update({label, hex_color}).eq("part_type", X).ilike("label", "%kód%")`)
 
 ### Co přesně je "Scéna 1"
 Schválené (2026-09-04) defaultní pozadí pro ÚPLNĚ VŠECHNY produktové fotky: plochý onyx černý
@@ -137,6 +151,13 @@ Postup kroků v builderu má být: **1) Základ → 2) Luneta/Pouzdro (case, hot
   nechat je v repu** — použité jednou k lokálnímu testování draftů (`na-miru-preview/page.tsx`),
   po ověření smazáno PŘED commitem. Kdyby se to omylem pushlo, byla by to bezpečnostní díra
   (kdokoliv by mohl vidět/rendrovat neaktivní/draft obsah).
+- **Barevné popisky variant vždy ověřit vizuálně u KAŽDÉ fotky zvlášť, nikdy neodhadovat/domýšlet
+  podle názvu modelu.** 2026-09-08: u importu 17 základů (`import-ga2100-base.mjs`) byly popisky
+  napsané "od oka" bez pořádné kontroly a několik jich bylo vyloženě špatně (např. "tyrkysové
+  detaily" a "stříbrný ciferník" byly navzájem prohozené u dvou různých hodinek, jiné měly barvu
+  co na fotce vůbec nebyla). Oprava: `scripts/fix-ga2100-base-labels.mjs` — projít si znovu KAŽDOU
+  zdrojovou fotku (`Read` tool přímo na soubor v `D:\AI\customshockz\input\ga2100_variants\`) a
+  popsat přesně to, co je vidět, než se cokoliv napíše do labelu.
 
 ## Pokračování na jiném zařízení (např. MacBook)
 Projekt žije na GitHubu, takže se nepřenáší souborem/e-mailem — naklonuje se:
