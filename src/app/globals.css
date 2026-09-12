@@ -202,9 +202,9 @@
 /* back to back, and slides left by exactly 1/N of its own width — since    */
 /* every copy is identical, the loop point is invisible. N=8 keeps the      */
 /* strip several screens wide so there's always more content ahead even on  */
-/* an ultra-wide monitor. Paused on hover (mouse only) so it's readable on  */
-/* demand; the site's global prefers-reduced-motion rule already collapses  */
-/* it to a single still frame for anyone who's asked for less motion.       */
+/* an ultra-wide monitor. Runs continuously, no hover-pause — the site's    */
+/* global prefers-reduced-motion rule already collapses it to a single      */
+/* still frame for anyone who's asked for less motion.                      */
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -216,10 +216,4 @@
 
 @utility animate-marquee {
   animation: marquee 32s linear infinite;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .animate-marquee:hover {
-    animation-play-state: paused;
-  }
 }

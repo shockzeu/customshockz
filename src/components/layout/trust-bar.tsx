@@ -1,8 +1,8 @@
 const TRUST_ITEMS = [
   "Ruční výroba na zakázku",
   "Doprava po ČR a SK",
-  "Bezpečná platba",
-  "Každý kus originál",
+  "Platba převodem nebo na dobírku",
+  "Žádné dva kusy nejsou stejné",
 ];
 
 const REPEAT_COUNT = 8;
