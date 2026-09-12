@@ -1,14 +1,24 @@
-# CustomShockz — stav projektu (2026-09-08)
+# CustomShockz — stav projektu (2026-09-12)
 
 ## ▶️ Začni tady v nové session
 Řekni Claude Code: **"přečti si HANDOFF.md a pojďme pokračovat na custom builderu"** — všechno
-potřebné je v sekci **🔨 Custom builder** níže. Krátce: builder na `/na-miru` je živý a funkční
-(krok Základ → krok Pouzdro/luneta). **Čeká na Lukáše:** 7 variant ciferníku (`dial`) je
-naimportovaných jako draft a commitnutých lokálně, ale **není to pushnuté ani aktivované** —
-až to Lukáš odsouhlasí, pushnout `main` a teprve potom aktivovat řádky (v tomhle pořadí, viz
-Poznámky k workflow). Postup zpracování nových fotek (stáhnout → ukázat očíslovaný přehled →
-Lukáš vybere → Scéna 1 → import jako draft → **teprve po pokynu aktivovat**) je popsaný v sekci
-"Další kroky" níže — drž se ho přesně, ušetří to opravování chyb.
+potřebné je v sekci **🔨 Custom builder** níže. Builder na `/na-miru` je živý a funkční, 3 kroky
+(Základ → Luneta → Číselník), náhledový obrázek správně sleduje aktuální krok. Ciferníky jsou
+pushnuté a aktivované (2026-09-12). Postup zpracování nových fotek (stáhnout → ukázat očíslovaný
+přehled → Lukáš vybere → Scéna 1 → import jako draft → **teprve po pokynu aktivovat**) je popsaný
+v sekci "Další kroky" níže — drž se ho přesně, ušetří to opravování chyb.
+
+**2026-09-12 — dvě reálné chyby nahlášené Lukášem při přidávání prvního skutečného produktu,
+obě opravené a pushnuté rovnou (blokovaly přidávání katalogu):**
+1. Produkt šel doplnit jen o JEDNU fotku → přidán sloupec `image_urls` (pole), admin formulář
+   teď bere víc souborů najednou (`<input multiple>`), na stránce produktu je z nich galerie
+   s náhledy (`src/components/product-gallery.tsx`), pokud je fotek víc než jedna.
+2. Každý produkt v kategorii `watches` automaticky renderoval CELÝ multi-step Configurator pod
+   sebou (`isConfigurable = product.category === "watches"` v `produkt/[slug]/page.tsx`) — dřív
+   to nebylo vidět, protože `part_variants` bylo prázdné/draft, ale teď že má `base`/`case`/`dial`
+   aktivní řádky, se pod KAŽDÝM hotovým kusem objevil cizí "postav si vlastní" builder. Oprava:
+   stránka jednotlivého produktu už Configurator vůbec nepoužívá, vždy jen `SimpleOrderButton`
+   — multi-step builder zůstává výhradně na `/na-miru`.
 
 ## Co to je
 Custom G-Shock e-shop v `D:\claude code\customshockz` (na GitHubu: `shockzeu/customshockz`, branch `main`, živě na `https://www.customshockz.eu`). Next.js 16 (App Router), TypeScript, Tailwind v4, shadcn/ui, framer-motion. Paleta "Ice & Onyx" (dark default).
@@ -69,10 +79,9 @@ který se mění podle kliknuté miniatury. **Lukáš dělá zatím jen model GA
     reference, který přesný model objednat u dodavatele, když přijde objednávka
 - **7× `dial`** — ciferníky "Who cares I'm already late" (2in1 sada z AliExpressu), tj. `Originál
   (neměnit)` bez fotky + 6 barev (černý, bílý s černým/modrým/červeným písmem, tyrkysový, ledově
-  modrý). **VŠECHNY jako draft `is_active = false`**, čekají na Lukášovo odsouhlasení.
-  `Originál` je vložený jako první, takže je i výchozí volbou (výměna ciferníku je opt-in).
-  Import: `scripts/import-ga2100-dials.mjs`. Cena zatím u všech `price_modifier: 0` — Lukáš
-  příplatek ještě neurčil.
+  modrý). **Aktivní, live** od 2026-09-12. `Originál` je vložený jako první, takže je i výchozí
+  volbou (výměna ciferníku je opt-in). Import: `scripts/import-ga2100-dials.mjs`. Cena zatím
+  u všech `price_modifier: 0` — Lukáš příplatek ještě neurčil.
 - **Postgres `part_type` enum** rozšířen o `base` (migrace `0008`) a `relief` (migrace `0009`).
   Staré hodnoty `bezel-iced`/`strap` v enumu zůstaly (Postgres neumí snadno mazat hodnoty z enumu
   bez přestavby typu) — nevadí, nic je nepoužívá, appka je ignoruje.
@@ -126,10 +135,8 @@ tyrkysové) a tuhle jednu masku pak použít na všechny barvy.
 ### 🔜 Další kroky (v tomhle pořadí, potvrzeno s Lukášem)
 Postup kroků v builderu má být: **1) Základ → 2) Luneta/Pouzdro (case, hotovo) → 3) Číselník → 4) Reliéf**
 
-1. **Číselník** (`part_type: "dial"`) — ✅ zpracováno 2026-09-08, 7 variant naimportováno jako
-   draft (viz výše). **Zbývá:** Lukáš je schválí → pushnout `main` (kvůli přehození pořadí kroků
-   v `PART_TYPES`) → **teprve pak aktivovat** řádky. Otevřená otázka: příplatek za ciferník
-   (`price_modifier`), teď je všude 0.
+1. **Číselník** (`part_type: "dial"`) — ✅ hotovo a live od 2026-09-12 (7 variant, pushnuto
+   i aktivováno). Otevřená otázka: příplatek za ciferník (`price_modifier`), teď je všude 0.
 2. **Reliéf** (`part_type: "relief"`) — gumové indexy/rysky na ciferníku (G-Shock nemá čísla, jen
    rysky, a ty jdou vyměnit za custom gumové). Lukáš pošle odkaz (AliExpress/jiný) s variantami,
    stejný postup jako u krytů: stáhnout ve vysokém rozlišení, očíslovat/ukázat přehled, Lukáš
@@ -181,7 +188,8 @@ Postup kroků v builderu má být: **1) Základ → 2) Luneta/Pouzdro (case, hot
 - Databázové migrace (`supabase/migrations/*.sql`) se pouštějí ručně v Supabase SQL Editoru — dá
   se to udělat i přímo v Chrome (přihlášený účet), stačí otevřít SQL Editor a vložit obsah migrace.
   Odkaz: `https://supabase.com/dashboard/project/cmejkszywblqrnpyxogp/sql/new`
-- Aktuální migrace: `0001` až `0009` (naposledy `0009_relief_part_type.sql`)
+- Aktuální migrace: `0001` až `0010` (naposledy `0010_product_images.sql` — sloupec `image_urls`
+  na `products`, spuštěno 2026-09-12)
 - **Nikdy nevytvářet dočasné "preview" stránky/routy, co obchází RLS přes service-role klíč, a
   nechat je v repu** — použité jednou k lokálnímu testování draftů (`na-miru-preview/page.tsx`),
   po ověření smazáno PŘED commitem. Kdyby se to omylem pushlo, byla by to bezpečnostní díra
