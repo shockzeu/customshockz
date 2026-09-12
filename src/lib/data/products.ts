@@ -12,6 +12,7 @@ function toProduct(row: ProductRow): Product {
     currency: "CZK",
     description: row.description ?? "",
     imageUrl: row.image_url,
+    imageUrls: row.image_urls?.length ? row.image_urls : row.image_url ? [row.image_url] : [],
     inStock: row.in_stock,
     category: row.category ?? "watches",
     codAllowed: row.cod_allowed,

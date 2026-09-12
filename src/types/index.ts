@@ -20,6 +20,8 @@ export type Product = {
   currency: "CZK";
   description: string;
   imageUrl: string | null;
+  /** Every product photo in display order. Empty when the product has none. */
+  imageUrls: string[];
   inStock: boolean;
   category: ProductCategory;
   /** Whether cash-on-delivery is allowed for this product — off by default for made-to-order pieces. */
@@ -60,6 +62,8 @@ export type ProductRow = {
   slug: string | null;
   description: string | null;
   image_url: string | null;
+  /** Every product photo in display order; `image_url` mirrors the first entry. */
+  image_urls: string[];
   base_price: number; // haléře (CZK * 100)
   in_stock: boolean;
   is_active: boolean;

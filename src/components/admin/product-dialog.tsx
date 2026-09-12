@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader2, Upload, X } from "lucide-react";
@@ -69,11 +69,36 @@ export function ProductDialog({
   const [inStock, setInStock] = useState(product?.in_stock ?? true);
   const [active, setActive] = useState(product?.is_active ?? true);
   const [codAllowed, setCodAllowed] = useState(product?.cod_allowed ?? false);
-  const [imageUrl, setImageUrl] = useState<string | null>(
-    product?.image_url ?? null,
-  );
-  const [file, setFile] = useState<File | null>(null);
+  const initialUrls =
+    product?.image_urls?.length
+      ? product.image_urls
+      : product?.image_url
+        ? [product.image_url]
+        : [];
+  const [existingUrls, setExistingUrls] = useState<string[]>(initialUrls);
+  const [newFiles, setNewFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
+
+  // Preview entries in display order: kept existing photos first, then newly
+  // picked files (as local object URLs). Memoized on `newFiles` itself so a
+  // blob URL is only (re)created when the file list actually changes, not on
+  // every render — the cleanup below then reliably revokes the exact set it
+  // created instead of leaking one per re-render.
+  const newFilePreviews = useMemo(
+    () => newFiles.map((f) => URL.createObjectURL(f)),
+    [newFiles],
+  );
+  useEffect(() => {
+    return () => newFilePreviews.forEach((u) => URL.revokeObjectURL(u));
+  }, [newFilePreviews]);
+  const previews = [...existingUrls, ...newFilePreviews];
+
+  function removeExisting(url: string) {
+    setExistingUrls((u) => u.filter((x) => x !== url));
+  }
+  function removeNewFile(index: number) {
+    setNewFiles((f) => f.filter((_, i) => i !== index));
+  }
 
   function resetForNew() {
     if (!isEdit) {
@@ -86,8 +111,8 @@ export function ProductDialog({
       setInStock(true);
       setActive(true);
       setCodAllowed(false);
-      setImageUrl(null);
-      setFile(null);
+      setExistingUrls([]);
+      setNewFiles([]);
       if (fileRef.current) fileRef.current.value = "";
     }
   }
@@ -101,24 +126,27 @@ export function ProductDialog({
     e.preventDefault();
     setSaving(true);
 
-    let finalImageUrl = imageUrl;
+    const uploadedUrls: string[] = [];
 
-    if (file) {
+    if (newFiles.length) {
       const supabase = createClient();
-      const ext = file.name.split(".").pop() ?? "jpg";
-      const path = `${crypto.randomUUID()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("product-images")
-        .upload(path, file, { upsert: false });
+      for (const f of newFiles) {
+        const ext = f.name.split(".").pop() ?? "jpg";
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("product-images")
+          .upload(path, f, { upsert: false });
 
-      if (upErr) {
-        toast.error("Nahrání obrázku selhalo", { description: upErr.message });
-        setSaving(false);
-        return;
+        if (upErr) {
+          toast.error("Nahrání obrázku selhalo", { description: upErr.message });
+          setSaving(false);
+          return;
+        }
+        uploadedUrls.push(
+          supabase.storage.from("product-images").getPublicUrl(path).data
+            .publicUrl,
+        );
       }
-      finalImageUrl = supabase.storage.from("product-images").getPublicUrl(
-        path,
-      ).data.publicUrl;
     }
 
     const res = await saveProduct({
@@ -127,7 +155,7 @@ export function ProductDialog({
       category,
       slug: slug || slugify(name),
       description,
-      imageUrl: finalImageUrl,
+      imageUrls: [...existingUrls, ...uploadedUrls],
       basePriceCzk: Number(price) || 0,
       inStock,
       isActive: active,
@@ -238,44 +266,61 @@ export function ProductDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="p-image">Fotka (volitelné)</Label>
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileRef.current?.click()}
-                  className="shrink-0"
-                >
-                  <Upload className="size-4" />
-                  Vybrat
-                </Button>
-                <span className="text-muted-foreground truncate text-sm">
-                  {file ? file.name : imageUrl ? "Aktuální fotka" : "Žádný soubor"}
-                </span>
-                {(file || imageUrl) && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => {
-                      setFile(null);
-                      setImageUrl(null);
-                      if (fileRef.current) fileRef.current.value = "";
-                    }}
-                    aria-label="Odebrat fotku"
-                  >
-                    <X className="size-4" />
-                  </Button>
-                )}
-                <input
-                  ref={fileRef}
-                  id="p-image"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                />
-              </div>
+              <Label htmlFor="p-image">Fotky (volitelné, první je titulní)</Label>
+              {previews.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {previews.map((url, i) => {
+                    const isExisting = i < existingUrls.length;
+                    return (
+                      <div
+                        key={url}
+                        className="border-border/60 relative size-16 shrink-0 overflow-hidden rounded-md border"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={url}
+                          alt=""
+                          className="size-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            isExisting
+                              ? removeExisting(url)
+                              : removeNewFile(i - existingUrls.length)
+                          }
+                          aria-label="Odebrat fotku"
+                          className="absolute top-0.5 right-0.5 rounded-full bg-black/70 p-0.5 text-white"
+                        >
+                          <X className="size-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => fileRef.current?.click()}
+                className="w-fit"
+              >
+                <Upload className="size-4" />
+                Přidat fotky
+              </Button>
+              <input
+                ref={fileRef}
+                id="p-image"
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  const picked = Array.from(e.target.files ?? []);
+                  setNewFiles((f) => [...f, ...picked]);
+                  e.target.value = "";
+                }}
+              />
             </div>
 
             <div className="flex items-center justify-between rounded-md border border-border/60 px-3 py-2.5">
