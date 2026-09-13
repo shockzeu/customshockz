@@ -1,12 +1,45 @@
-# CustomShockz — stav projektu (2026-09-12)
+# CustomShockz — stav projektu (2026-09-13)
 
 ## ▶️ Začni tady v nové session
 Řekni Claude Code: **"přečti si HANDOFF.md a pojďme pokračovat na custom builderu"** — všechno
-potřebné je v sekci **🔨 Custom builder** níže. Builder na `/na-miru` je živý a funkční, 3 kroky
-(Základ → Luneta → Číselník), náhledový obrázek správně sleduje aktuální krok. Ciferníky jsou
-pushnuté a aktivované (2026-09-12). Postup zpracování nových fotek (stáhnout → ukázat očíslovaný
-přehled → Lukáš vybere → Scéna 1 → import jako draft → **teprve po pokynu aktivovat**) je popsaný
-v sekci "Další kroky" níže — drž se ho přesně, ušetří to opravování chyb.
+potřebné je v sekci **🔨 Custom builder** níže. Builder na `/na-miru` je živý, funkční a **oceněný**:
+3 kroky (Základ → Luneta → Číselník), náhled sleduje aktuální krok, základní balíček **5 190 Kč**
+(hodinky + povinná iced-out luneta), barevný ciferník **+400 Kč** navrch, Originál ciferník zdarma.
+Nahoře na webu jede scrollující trust bar. Mobilní pokladna je opravená (nebyl tam horizontální
+scroll). Postup zpracování nových fotek (stáhnout → ukázat očíslovaný přehled → Lukáš vybere →
+Scéna 1 → import jako draft → **teprve po pokynu aktivovat**) je popsaný v sekci "Další kroky"
+níže — drž se ho přesně, ušetří to opravování chyb.
+
+**2026-09-13 — co přibylo dnes:**
+1. **Trust bar** — nekonečně scrollující pruh nad navigací se 4 hláškami (ruční výroba, doprava,
+   platba, "žádné dva kusy nejsou stejné"), čistá CSS `@keyframes` animace (`src/components/layout/trust-bar.tsx`
+   + `animate-marquee` utility v `globals.css`), běží nepřetržitě i pod myší (Lukáš nechtěl
+   hover-pauzu). Prošlo 3 koly úpravy textu, než se trefily hlášky, co pokrývají hodinky i šperky.
+2. **Oprava mobilní pokladny** — `/pokladna` grid (formulář + souhrn objednávky) neměl na mobilu
+   žádné explicitní `grid-cols`, jen `lg:grid-cols-[1fr_360px]`, takže se sloupec roztáhl podle
+   nejdelšího řádku v souhrnu (dlouhý config text) až na ~823px na 375px displeji — celá stránka
+   pak byla vodorovně rolovatelná. Oprava: přidán `grid-cols-1` na začátek (`src/app/(site)/pokladna/page.tsx`,
+   4 místa). Nahlásila to Lukášova přítelkyně při zkušební objednávce.
+3. **Cenovka builderu** — `basePriceCzk` na `/na-miru` bylo natvrdo `0`, všechny `price_modifier`
+   byly `0` → builder vždy ukazoval 0 Kč. Domluveno s Lukášem: pevný balíček (hodinky+luneta
+   dohromady, protože luneta je v builderu povinná, žádná varianta "originál") = **5 190 Kč**,
+   každý DALŠÍ krok (ciferník teď, ručičky/řemínky později) je nezávislý příplatek navrch, ne
+   něco, co se musí zpětně dopočítávat k cílové částce. Ciferník: Originál 0 Kč, ostatních
+   6 barev +400 Kč (nastaveno přes SQL update na `part_variants`, ne v repu).
+4. **Náramek jako první šperk** — Lukáš poslal `D:\customshockz\customshock.png` (iced Cuban
+   link náramek, foceno v ruce na modrém pozadí), prohnáno Scénou 1 → `bracelet_iced_cuban_scene1.png`.
+   Zatím JEN soubor, není naimportovaný jako produkt v adminu (kategorie Šperky) — čeká se, až
+   Lukáš řekne "nahraj to".
+5. **IG marketingová grafika** (mimo tenhle repo, samostatné soubory) — z fotky iced-out hodinek
+   v ruce (`D:\customshockz\customshock.png`) vyrobeno: hero vizuál na Scéně 1 s cenou/CTA,
+   "glow up" before/after (obyčejné vs. iced hodinky), UGC-hook card (originální foto + punchy
+   text), a cartoon/pop-art verze (ruka odstraněná přes RMBG + ruční domaskování + OpenCV
+   cartoon-filter, halftone pozadí). Skripty a výstupy v `D:\AI\customshockz\ig_ads.py`,
+   `ig_cartoon.py`, `D:\AI\customshockz\ig_output\`.
+6. **Remotion video projekt (`D:\claude code\customshockz-ads`) — odloženo, Lukáš to nechce
+   používat.** Zkusili jsme "skládací" video hodinek, výsledek se Lukášovi nelíbil ("je to
+   hrozný"). Samostatný projekt mimo tenhle repo, nijak nesouvisí s customshockz webem — není
+   potřeba se tím zabývat, pokud si o to Lukáš znovu neřekne.
 
 **2026-09-12 — dvě reálné chyby nahlášené Lukášem při přidávání prvního skutečného produktu,
 obě opravené a pushnuté rovnou (blokovaly přidávání katalogu):**
@@ -80,8 +113,10 @@ který se mění podle kliknuté miniatury. **Lukáš dělá zatím jen model GA
 - **7× `dial`** — ciferníky "Who cares I'm already late" (2in1 sada z AliExpressu), tj. `Originál
   (neměnit)` bez fotky + 6 barev (černý, bílý s černým/modrým/červeným písmem, tyrkysový, ledově
   modrý). **Aktivní, live** od 2026-09-12. `Originál` je vložený jako první, takže je i výchozí
-  volbou (výměna ciferníku je opt-in). Import: `scripts/import-ga2100-dials.mjs`. Cena zatím
-  u všech `price_modifier: 0` — Lukáš příplatek ještě neurčil.
+  volbou (výměna ciferníku je opt-in). Import: `scripts/import-ga2100-dials.mjs`. **Ceny hotové
+  od 2026-09-13**: Originál 0 Kč, ostatních 6 +400 Kč (`price_modifier`, nastaveno přes SQL, ne
+  v repu — když se budou ceny znovu měnit, je to `update part_variants set price_modifier=X where
+  part_type='dial' and label != 'Originál (neměnit)'`).
 - **Postgres `part_type` enum** rozšířen o `base` (migrace `0008`) a `relief` (migrace `0009`).
   Staré hodnoty `bezel-iced`/`strap` v enumu zůstaly (Postgres neumí snadno mazat hodnoty z enumu
   bez přestavby typu) — nevadí, nic je nepoužívá, appka je ignoruje.
@@ -132,16 +167,34 @@ zdrojové fotky 800×800, platí pro celou tuhle sérii ciferníků, protože je
 mine; spolehlivé je vytáhnout tvar z varianty, kde nejvíc kontrastuje (dírky z černé, okénko z
 tyrkysové) a tuhle jednu masku pak použít na všechny barvy.
 
+### 💰 Jak funguje cenotvorba builderu (důležité pro každý další krok)
+Rozhodnuto s Lukášem 2026-09-13, **drž se toho i pro budoucí kroky** (ručičky, řemínky, mod kit):
+
+- `basePriceCzk` na `/na-miru` (v `src/app/(site)/na-miru/page.tsx`, natvrdo v kódu, v haléřích)
+  = **5 190 Kč** = pevný balíček "hodinky + povinná iced-out luneta" dohromady. Je to JEDNA
+  cena za oba kroky (Základ i Pouzdro), protože luneta v builderu nejde vynechat (žádná varianta
+  "originál" u `case`) — nedává smysl ji cenit zvlášť.
+- Každý DALŠÍ krok navíc (Číselník teď, časem Ručičky/Řemínky/Mod kit) je **nezávislý příplatek**
+  (`price_modifier` na dané `part_variants` řadě, v haléřích, `price_modifier * 100` = Kč) —
+  NEPŘEPOČÍTÁVÁ se zpětně základní cena, aby "vyšla" na nějaké kulaté číslo. Když Lukáš řekne
+  "chci aby to i s XY vyšlo na Z Kč", řeš to nastavením ceny TOHO nového kroku, ne úpravou
+  `basePriceCzk` nebo starších `price_modifier` hodnot.
+- Číselník: Originál (neměnit) = 0 Kč (výchozí, opt-in výměna), ostatních 6 barev = +400 Kč.
+- Pokud Lukáš chce cenu změnit, je to buď úprava `basePriceCzk` v kódu (commit+push), nebo SQL
+  `update part_variants set price_modifier = X*100 where part_type = 'TYP' and label = '...'`
+  přes Supabase SQL Editor — bez potřeby nasazení.
+
 ### 🔜 Další kroky (v tomhle pořadí, potvrzeno s Lukášem)
 Postup kroků v builderu má být: **1) Základ → 2) Luneta/Pouzdro (case, hotovo) → 3) Číselník → 4) Reliéf**
 
-1. **Číselník** (`part_type: "dial"`) — ✅ hotovo a live od 2026-09-12 (7 variant, pushnuto
-   i aktivováno). Otevřená otázka: příplatek za ciferník (`price_modifier`), teď je všude 0.
+1. **Číselník** (`part_type: "dial"`) — ✅ hotovo, live a OCENĚNO od 2026-09-13 (viz sekce
+   cenotvorby výše).
 2. **Reliéf** (`part_type: "relief"`) — gumové indexy/rysky na ciferníku (G-Shock nemá čísla, jen
    rysky, a ty jdou vyměnit za custom gumové). Lukáš pošle odkaz (AliExpress/jiný) s variantami,
    stejný postup jako u krytů: stáhnout ve vysokém rozlišení, očíslovat/ukázat přehled, Lukáš
    vybere, projet přes Scénu 1, importovat. **Musí obsahovat i variantu "Originál"** (bez fotky,
-   `price_modifier: 0`) pro zákazníky, co nechtějí měnit nic. Pozn.: odkaz, co Lukáš poslal na
+   `price_modifier: 0`) pro zákazníky, co nechtějí měnit nic. Cenu nastavit stejným způsobem jako
+   u ciferníku (nezávislý příplatek, viz sekce cenotvorby výše). Pozn.: odkaz, co Lukáš poslal na
    ručičky (hodinové ručičky, 12 barev) zatím nikam nepatří — není pro ně krok v builderu.
 3. **Mod kit** — CELÝ set pouzdro+řemínek (např. "AP mod kit" styl), do kterého se přesune původní
    strojek/modul → ciferník zůstává stejný jako na originále. **Nejde kombinovat s iced-out lunetou**
