@@ -29,7 +29,7 @@ export default async function NaMiruPage() {
           productSlug={null}
           productName="Zakázka na míru"
           imageUrl={null}
-          basePriceCzk={0}
+          basePriceCzk={519000} // 5 190 Kč — balíček hodinky + povinná iced-out luneta
           partsByType={partsByType}
           inStock
           codAllowed={false}
