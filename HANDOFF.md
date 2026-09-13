@@ -1,14 +1,26 @@
 # CustomShockz — stav projektu (2026-09-13)
 
 ## ▶️ Začni tady v nové session
-Řekni Claude Code: **"přečti si HANDOFF.md a pojďme pokračovat na custom builderu"** — všechno
-potřebné je v sekci **🔨 Custom builder** níže. Builder na `/na-miru` je živý, funkční a **oceněný**:
-3 kroky (Základ → Luneta → Číselník), náhled sleduje aktuální krok, základní balíček **5 190 Kč**
-(hodinky + povinná iced-out luneta), barevný ciferník **+400 Kč** navrch, Originál ciferník zdarma.
-Nahoře na webu jede scrollující trust bar. Mobilní pokladna je opravená (nebyl tam horizontální
-scroll). Postup zpracování nových fotek (stáhnout → ukázat očíslovaný přehled → Lukáš vybere →
-Scéna 1 → import jako draft → **teprve po pokynu aktivovat**) je popsaný v sekci "Další kroky"
-níže — drž se ho přesně, ušetří to opravování chyb.
+Řekni Claude Code: **"přečti si HANDOFF.md a pojďme pokračovat"**.
+
+### Co je další krok (seřazeno, co je hotové vs. na čem se čeká na Lukáše)
+1. **✅ Hotovo, nic nedělat** — builder (Základ → Luneta → Číselník) je živý, funkční, oceněný
+   (5 190 Kč balíček + 400 Kč ciferník navrch), trust bar běží, mobilní pokladna opravená.
+2. **Připraveno, čeká se jen na "nahraj to"** — náramek (`bracelet_iced_cuban_scene1.png`, viz
+   níže "2026-09-13") je hotový, stačí ho naimportovat jako produkt v adminu (kategorie Šperky).
+3. **Čeká se na Lukáše, aby poslal materiál:**
+   - Odkaz s variantami **reliéfu** (gumové rysky na ciferníku) — až přijde, postup je v sekci
+     "Další kroky" → bod 2 níže (stáhnout → očíslovat → Lukáš vybere → Scéna 1 → import jako
+     draft → počkat na "aktivuj").
+   - **Reálné fotky z fotoboxu** pro skutečný katalog hodinek (teď je v obchodě prázdno/draft).
+   - **Právní údaje** (IČO, sídlo) do Obchodních podmínek a GDPR — teď tam je placeholder.
+   - Fotky **mod kitů** (viz "Další kroky" → bod 3) — teprve pak se dá začít programovat.
+4. **Volitelné, kdykoliv** — ověřit doménu `customshockz.eu` v Resend, ať potvrzovací e-maily
+   nechodí do spamu.
+
+Postup zpracování nových fotek (stáhnout → ukázat očíslovaný přehled → Lukáš vybere → Scéna 1 →
+import jako draft → **teprve po pokynu aktivovat**) je popsaný v sekci "Další kroky" níže — drž
+se ho přesně, ušetří to opravování chyb.
 
 **2026-09-13 — co přibylo dnes:**
 1. **Trust bar** — nekonečně scrollující pruh nad navigací se 4 hláškami (ruční výroba, doprava,
