@@ -94,10 +94,10 @@ export default function PokladnaPage() {
         </h1>
       </Reveal>
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_360px]">
+      <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]">
         <Reveal delay={0.05}>
           <form onSubmit={onSubmit} className="space-y-6">
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="c-name">Jméno a příjmení</Label>
                 <Input
@@ -143,7 +143,7 @@ export default function PokladnaPage() {
               />
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="c-city">Město</Label>
                 <Input
@@ -168,7 +168,7 @@ export default function PokladnaPage() {
 
             <div className="grid gap-2">
               <Label>Způsob platby</Label>
-              <div className="grid gap-2 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {availableMethods.map((method) => (
                   <button
                     key={method}
