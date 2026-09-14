@@ -217,3 +217,33 @@
 @utility animate-marquee {
   animation: marquee 32s linear infinite;
 }
+
+/* Builder step entrance: each variant thumbnail fades up a beat after the    */
+/* one before it, so a new step reads as arriving rather than appearing. The  */
+/* per-item delay is set inline. CSS rather than JS so it keeps running off   */
+/* the main thread while the step's images are still decoding.                */
+@keyframes thumb-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* `backwards`, never `both`: the delay still hides the item before its turn, */
+/* but a thumbnail whose animation never runs falls back to its normal, fully */
+/* visible style instead of being stranded at opacity 0.                      */
+@utility animate-thumb-in {
+  animation: thumb-in 200ms cubic-bezier(0.23, 1, 0.32, 1) backwards;
+}
+
+/* The global reduce block shortens durations but not delays — without this a */
+/* thumbnail would still wait out its stagger before snapping in.             */
+@media (prefers-reduced-motion: reduce) {
+  .animate-thumb-in {
+    animation-delay: 0ms !important;
+  }
+}

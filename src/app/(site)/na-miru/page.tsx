@@ -6,20 +6,20 @@ import { Reveal } from "@/components/motion/reveal";
 
 export const metadata = {
   title: "Zakázka na míru | CustomShockz",
-  description: "Postav si vlastní custom G-Shock — vyber si pouzdro, číselník, řemínek a lunetu.",
+  description: "Postav si vlastní custom G-Shock — vyber si základ, iced-out lunetu a číselník.",
 };
 
 export default async function NaMiruPage() {
   const partsByType = await getPartVariantsByType();
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
       <Reveal>
         <h1 className="font-heading text-3xl font-bold tracking-tight uppercase sm:text-4xl">
           Postav si vlastní kus
         </h1>
         <p className="text-muted-foreground mt-3 max-w-2xl text-base sm:text-lg">
-          Vyber si pouzdro, číselník, řemínek a lunetu podle sebe — cena
+          Vyber si základ, iced-out lunetu a číselník podle sebe — cena
           se počítá rovnou. Přidej si to do košíku a dokonči objednávku.
         </p>
       </Reveal>
@@ -36,7 +36,7 @@ export default async function NaMiruPage() {
         />
       </div>
 
-      <Reveal delay={0.1} className="border-border/60 mt-14 rounded-xl border p-6">
+      <Reveal delay={0.1} className="border-border/60 mt-14 max-w-3xl rounded-xl border p-6">
         <h2 className="text-lg font-semibold">
           Nevidíš tu, co chceš?
         </h2>
