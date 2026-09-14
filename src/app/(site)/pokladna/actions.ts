@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sendOrderEmails } from "@/lib/email";
 import type { CartItem, PaymentMethod } from "@/types";
 
@@ -38,7 +38,10 @@ export async function createOrder(
       0,
     );
 
-    const supabase = await createClient();
+    // Service-role, not the anon client: PostgREST returns the inserted row
+    // (see .select() below), which needs a SELECT policy on top of INSERT —
+    // and customers must never be able to SELECT other people's orders.
+    const supabase = createAdminClient();
 
     const { data: order, error: orderError } = await supabase
       .from("orders")
