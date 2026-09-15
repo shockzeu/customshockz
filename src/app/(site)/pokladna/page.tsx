@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
+import { siteConfig } from "@/config/site";
 import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -16,6 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Reveal } from "@/components/motion/reveal";
+
+// Strong ease-out (quart) — matches components/motion/reveal.tsx.
+const EASE_OUT_QUART = [0.23, 1, 0.32, 1] as const;
 
 export default function PokladnaPage() {
   const router = useRouter();
@@ -30,6 +35,7 @@ export default function PokladnaPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("bank_transfer");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   // Cash on delivery risks unpaid custom/made-to-order pieces going
   // unclaimed — only offer it when every item in the cart allows it.
@@ -185,6 +191,42 @@ export default function PokladnaPage() {
                   </button>
                 ))}
               </div>
+
+              {/* What happens next, shown before submit rather than as a  */}
+              {/* surprise on the thank-you page — a stranger's account    */}
+              {/* number appearing only after commitment reads as risky.   */}
+              <AnimatePresence mode="wait" initial={false}>
+                {effectivePaymentMethod === "bank_transfer" ? (
+                  <motion.p
+                    key="bank_transfer"
+                    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18, ease: EASE_OUT_QUART }}
+                    className="text-muted-foreground bg-accent/40 rounded-lg px-3 py-2.5 text-xs leading-relaxed"
+                  >
+                    Platí se na účet{" "}
+                    <span className="text-foreground font-medium">
+                      {siteConfig.bankAccount}
+                    </span>
+                    . Variabilní symbol a přesnou částku pošleme e-mailem hned
+                    po odeslání objednávky — zpracovávat ji začneme, jakmile
+                    platba dorazí.
+                  </motion.p>
+                ) : (
+                  <motion.p
+                    key="cash_on_delivery"
+                    initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18, ease: EASE_OUT_QUART }}
+                    className="text-muted-foreground bg-accent/40 rounded-lg px-3 py-2.5 text-xs leading-relaxed"
+                  >
+                    Nic neplatíš předem — zaplatíš až při převzetí zásilky
+                    kurýrovi nebo na poště.
+                  </motion.p>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="grid gap-2">
