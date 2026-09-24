@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { getProductBySlug } from "@/lib/data/products";
+import { getProductOptionsByProductId } from "@/lib/data/product-options";
 import { formatPrice } from "@/lib/format";
 import { PRODUCT_CATEGORY_LABELS } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { ProductGallery } from "@/components/product-gallery";
+import { ProductVariants } from "@/components/product-variants";
 import { SimpleOrderButton } from "@/components/simple-order-button";
 
 export async function generateMetadata({
@@ -48,6 +50,9 @@ export default async function ProductPage({
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
+  const optionsByGroup = await getProductOptionsByProductId(product.id);
+  const hasOptions = Object.keys(optionsByGroup).length > 0;
+
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
@@ -74,14 +79,26 @@ export default async function ProductPage({
           )}
 
           <div className="mt-8">
-            <SimpleOrderButton
-              productSlug={product.slug}
-              productName={product.name}
-              imageUrl={product.imageUrl}
-              priceCzk={product.priceCzk}
-              inStock={product.inStock}
-              codAllowed={product.codAllowed}
-            />
+            {hasOptions ? (
+              <ProductVariants
+                productSlug={product.slug}
+                productName={product.name}
+                imageUrl={product.imageUrl}
+                basePriceCzk={product.priceCzk}
+                optionsByGroup={optionsByGroup}
+                inStock={product.inStock}
+                codAllowed={product.codAllowed}
+              />
+            ) : (
+              <SimpleOrderButton
+                productSlug={product.slug}
+                productName={product.name}
+                imageUrl={product.imageUrl}
+                priceCzk={product.priceCzk}
+                inStock={product.inStock}
+                codAllowed={product.codAllowed}
+              />
+            )}
           </div>
         </div>
       </div>

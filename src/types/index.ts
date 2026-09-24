@@ -85,6 +85,24 @@ export type PartVariantRow = {
   created_at: string;
 };
 
+/**
+ * Per-product options (length, color, ...) for a single regular product —
+ * unlike `PartVariantRow`, these belong to one `product_id` and are grouped
+ * by a free-text `group_name` chosen per product (e.g. "Délka", "Barva").
+ */
+export type ProductOptionRow = {
+  id: string;
+  product_id: string;
+  group_name: string;
+  label: string;
+  hex_color: string | null;
+  image_url: string | null;
+  price_modifier: number; // haléře (CZK * 100), can be negative
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+};
+
 // ---------- Cart / checkout ----------
 
 export const PAYMENT_METHODS = ["bank_transfer", "cash_on_delivery"] as const;

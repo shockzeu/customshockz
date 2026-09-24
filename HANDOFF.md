@@ -1,26 +1,78 @@
-# CustomShockz — stav projektu (2026-09-13)
+# CustomShockz — stav projektu (2026-09-17)
 
 ## ▶️ Začni tady v nové session
 Řekni Claude Code: **"přečti si HANDOFF.md a pojďme pokračovat"**.
 
-### Co je další krok (seřazeno, co je hotové vs. na čem se čeká na Lukáše)
-1. **✅ Hotovo, nic nedělat** — builder (Základ → Luneta → Číselník) je živý, funkční, oceněný
-   (5 190 Kč balíček + 400 Kč ciferník navrch), trust bar běží, mobilní pokladna opravená.
-2. **Připraveno, čeká se jen na "nahraj to"** — náramek (`bracelet_iced_cuban_scene1.png`, viz
-   níže "2026-09-13") je hotový, stačí ho naimportovat jako produkt v adminu (kategorie Šperky).
-3. **Čeká se na Lukáše, aby poslal materiál:**
-   - Odkaz s variantami **reliéfu** (gumové rysky na ciferníku) — až přijde, postup je v sekci
-     "Další kroky" → bod 2 níže (stáhnout → očíslovat → Lukáš vybere → Scéna 1 → import jako
-     draft → počkat na "aktivuj").
-   - **Reálné fotky z fotoboxu** pro skutečný katalog hodinek (teď je v obchodě prázdno/draft).
-   - **Právní údaje** (IČO, sídlo) do Obchodních podmínek a GDPR — teď tam je placeholder.
-   - Fotky **mod kitů** (viz "Další kroky" → bod 3) — teprve pak se dá začít programovat.
-4. **Volitelné, kdykoliv** — ověřit doménu `customshockz.eu` v Resend, ať potvrzovací e-maily
-   nechodí do spamu.
+### 🔴 Nejaktuálnější rozdělaná práce (2026-09-17) — pokračuj TADY
+Rozjeli jsme katalog **Šperky** (byl úplně prázdný). Lukáš vybral přesně **3 produkty** k
+naimportování ještě "dnes" (viz sekce "💎 Šperky — katalog" níže pro plné detaily, odkazy,
+materiály i to, co přesně znamená "Scéna 1 přes ChatGPT"). Stav rozdělané práce:
 
-Postup zpracování nových fotek (stáhnout → ukázat očíslovaný přehled → Lukáš vybere → Scéna 1 →
-import jako draft → **teprve po pokynu aktivovat**) je popsaný v sekci "Další kroky" níže — drž
-se ho přesně, ušetří to opravování chyb.
+1. **Fotky (9 ks, 3 na produkt) — NEDOKONČENO, PRVNÍ POKUS NEPOVEDENÝ, ZAČNI TADY.**
+   Zkoušíme nový postup: místo ComfyUI (na druhém PC) generovat/kompozitovat fotky přes
+   **ChatGPT (placený tarif ChatGPT Go)** — nahrát zdrojovou fotku produktu + referenční
+   `scene1-pozadi.png` a napsat prompt, ať to složí dohromady.
+
+   **Co se stalo:** zpráva se v Chrome tabu s ChatGPT (`chatgpt.com/c/6aab48ab-9c44-83ed-bae0-d431f53fd4bb`)
+   nakonec odeslala (i přes vyskakovací "Get smarter answers" modal přes Send tlačítkem) a
+   ChatGPT vygeneroval obrázek. **Výsledek je ale špatný a NEPOUŽITELNÝ**: ChatGPT prakticky
+   jen mírně upravilo pozadí u PŮVODNÍ fotky — ruka/zápěstí se zlatým náramkem tam pořád je,
+   pozadí je modrý gradient s kruhovou září, ale NENÍ to Scéna 1 (chybí plochý černý backdrop,
+   je to spíš tmavě modrý prostor) a hlavně **produkt vůbec není vyfocený samostatně** — přesně
+   to, co prompt výslovně zakazoval ("remove the wrist/hand entirely... No hands, no wrist").
+   Já (Claude) jsem tenhle výsledek předtím vzal jako hotový/OK bez pořádné kontroly — **nedělej
+   to znovu, zkontroluj KAŽDÝ vygenerovaný obrázek proti checklistu níže, než ho ukážeš Lukášovi
+   jako hotový.**
+
+   **Co dělat jako úplně první krok v nové session:**
+   - Otevři ten samý ChatGPT chat a podívej se na vygenerovaný obrázek (screenshot výše popsán).
+   - Nesnaž se to opravit stejným promptem znovu se stejnými vstupy — ChatGPT má očividně problém
+     spolehlivě "vysvléknout" produkt z ruky/zápěstí jen na základě textové instrukce v editačním
+     režimu obrázku. Vyzkoušej radši dvoukrokový přístup: (a) nejdřív ChatGPT požádat JEN o
+     vyjmutí/vygenerování produktu samotného (bez pozadí, bez ruky) z fotky produktu, teprve
+     (b) až se tenhle mezikrok povede, samostatným promptem to zkompozituj na Scénu 1. Případně
+     zkusit explicitnější formulaci ("photograph of the bracelet by itself, laid flat/curled on
+     a table, no hand, no skin, no wrist visible anywhere in the frame") nebo referenční fotku
+     "jak správně vypadá produktová fotka bez ruky" přiložit jako třetí obrázek.
+   - **Checklist, co MUSÍ platit, než se obrázek prohlásí za hotový:**
+     1. Nikde není vidět kůže/ruka/zápěstí — jen samotný šperk.
+     2. Pozadí je plochý, jednolitý onyx černý backdrop (ne gradient do modra, ne tmavě modrý
+        prostor) s měkkou ledově modrou září — přesně jako `scene1-pozadi.png`.
+     3. Žádná 3D perspektiva/podlaha/stěna/místnost.
+     4. Barvy/detaily produktu (barva kovu, kamínky) odpovídají zdrojové fotce, nic se nesmí
+        "vymyslet" navíc.
+   - Pokud po pár pokusech ChatGPT pořád nezvládá čistě odstranit ruku, zvaž návrat k osvědčené
+     ComfyUI pipeline (RMBG maska už uměla přesně tohle u hodinek/náramku — viz "Co přesně je
+     Scéna 1" výše) aspoň pro krok "odstranit ruku", a Scénu 1 dokompozitovat tam.
+   - Až bude jeden obrázek OK podle checklistu výše, teprve pak pokračovat na zbylých 8 fotek
+     (3 produkty × 3 fotky) a ukázat Lukášovi až finální sadu, ne průběžné nepovedené pokusy.
+2. **DB migrace `0011_product_options.sql` — NAPSANÁ, ale ještě NESPUŠTĚNÁ** v Supabase SQL Editoru.
+   Musí se pustit dřív, než půjde cokoliv s variantami reálně uložit.
+3. **Kód pro "vyber si variantu" na stránce produktu — NAPSANÝ, ale ještě NEZAPOJENÝ.** Nová
+   komponenta `src/components/product-variants.tsx` existuje a je hotová, ale
+   `src/app/(site)/produkt/[slug]/page.tsx` ji ještě nepoužívá (pořád tam vždy jede jen
+   `SimpleOrderButton`). Potřeba: podmíněně renderovat `ProductVariants`, když
+   `getProductOptionsByProductId(product.id)` vrátí neprázdný objekt.
+4. **Import produktů do Supabase — NEEXISTUJE ještě žádný script.** Až budou fotky hotové, napsat
+   one-off import script (vzor: `scripts/import-ga2100-dials.mjs`) — vytvoří 3 řádky v `products`
+   (kategorie `bracelets`/`earrings`) + jejich `product_options` řádky (délka, barva...), **vše
+   jako draft (`is_active: false`)** — normální pravidlo, počkat na Lukášovo "aktivuj".
+5. Popisek KAŽDÉHO produktu musí uvádět skutečný materiál (viz sekce Šperky níže — Lukáš to
+   explicitně chce, i u obyčejné slitiny/mosazi, hlavně že je to v popisu napsané).
+
+### Starší dokončená práce (co NEŘEŠIT, je hotové a live)
+1. **✅ Builder** (Základ → Luneta → Číselník) je živý, funkční, oceněný (5 190 Kč balíček +
+   400 Kč ciferník navrch), dvousloupcový sticky layout s vylepšenými animacemi (viz
+   "2026-09-1x — layout a animace builderu" níže), trust bar běží, mobilní pokladna opravená.
+2. **✅ Checkout byl rozbitý, teď opravený** — RLS bug (viz "Opravy 2026-09-1x" níže) + přidaný
+   trust panel s údaji k platbě před odesláním objednávky.
+3. **Připraveno, čeká se jen na "nahraj to"** — náramek (`bracelet_iced_cuban_scene1.png`) je
+   hotový, stačí ho naimportovat jako produkt v adminu (kategorie Šperky) — nesouvisí s dnešními
+   3 novými produkty, je to samostatná starší položka.
+4. **Čeká se na Lukáše, aby poslal materiál:** odkaz s variantami reliéfu, reálné fotky z
+   fotoboxu, právní údaje (IČO/sídlo), fotky mod kitů.
+5. **Volitelné, kdykoliv** — ověřit doménu `customshockz.eu` v Resend, ať potvrzovací e-maily
+   nechodí do spamu.
 
 **2026-09-13 — co přibylo dnes:**
 1. **Trust bar** — nekonečně scrollující pruh nad navigací se 4 hláškami (ruční výroba, doprava,
@@ -64,6 +116,131 @@ obě opravené a pushnuté rovnou (blokovaly přidávání katalogu):**
    aktivní řádky, se pod KAŽDÝM hotovým kusem objevil cizí "postav si vlastní" builder. Oprava:
    stránka jednotlivého produktu už Configurator vůbec nepoužívá, vždy jen `SimpleOrderButton`
    — multi-step builder zůstává výhradně na `/na-miru`.
+
+**2026-09-17 (tahle session) — co přibylo:**
+1. **Oprava rozbité pokladny (checkout úplně nefungoval)** — Lukášova přítelkyně zkoušela
+   objednávku a nešlo to. Root cause: `createOrder` v `src/app/(site)/pokladna/actions.ts` insertoval
+   do `orders`/`order_items` přes ANON Supabase klienta. RLS politika sice povolovala `insert`, ale
+   PostgREST po insertu automaticky dělá i `select` na vrácený řádek (kvůli `.insert().select()`
+   řetězení v knihovně) — a `select` politiku pro `anon` na `orders` záměrně NEMÁME (jinak by
+   kdokoliv mohl číst cizí jména/adresy). Insert tak spadl na `select` kroku. **Oprava:** nový
+   `src/lib/supabase/admin.ts` (service-role klient, obchází RLS úplně) — `createOrder` teď
+   používá tenhle klient jen pro insert do `orders`/`order_items`. Ověřeno reálnou objednávkou
+   naživo, testovací řádek pak smazán jednorázovým scriptem (nezůstal v repu).
+2. **Trust panel v pokladně** — Lukášův postřeh: "poděkujem za objednávku a AŽ PAK se objeví číslo
+   účtu" = nedůvěryhodné. Teď se hned pod výběrem platební metody (`src/app/(site)/pokladna/page.tsx`)
+   zobrazí crossfade panel: u bankovního převodu rovnou číslo účtu (`siteConfig.bankAccount`) +
+   vysvětlení, u dobírky vysvětlení, že se platí až při doručení. Vidí to PŘED odesláním objednávky.
+3. **Vylepšené animace v `/na-miru` builderu** — Lukáš chtěl hezčí swipe přechody mezi kroky.
+   `src/components/configurator.tsx`: přepsáno na dvousloupcový sticky layout
+   (`lg:grid-cols-[minmax(0,1fr)_400px]`, velký náhled vlevo zůstává vidět i při scrollování
+   pravého sloupce s volbami), silnější slide+fade přechod mezi kroky (40px posun, 280ms), tečkový
+   indikátor kroku se teď plynule přesouvá (framer-motion `layoutId`), a nové miniatury (fotky
+   variant) mají nástupovou "stagger" animaci (`@keyframes thumb-in` v `globals.css`, postupně
+   po sobě, `animation-fill-mode: backwards` — kdyby se animace z nějakého důvodu nespustila,
+   thumbnail zůstane vidět, ne neviditelný). **Lekce zapsaná do paměti:** pokud se animace testuje
+   v Chrome tabu, co je v tu chvíli NA POZADÍ (skrytý), `requestAnimationFrame` stojí a vypadá to
+   jako rozbitý kód, i když není — vždycky testovat ve viditelném tabu.
+
+## 💎 Šperky — katalog (rozjeto 2026-09-17, NEDOKONČENO)
+
+Kategorie "Šperky" byla úplně prázdná. Lukáš chce hlavně **náramky a přívěsky** (řetízky zatím ne
+— explicitně řekl "řetízky zatím ne jen ty přívěsky"). Postup hledání produktů byl: hledali jsme
+na AliExpress/Alibaba/Temu (přes `claude-in-chrome`, Lukášův přihlášený Chrome — izolovaný Browser
+panel v Claude Code na těchhle e-shopech nefunguje, viz bod 4 v sekci builderu výše, platí to
+stejně i pro Alibaba/Temu).
+
+### ⚠️ Důležité pravidlo o materiálu (Lukášovo explicitní rozhodnutí, drž se ho)
+Nejdřív jsem produkty filtroval jen na nerez ocel / 925 stříbro (Lukáš odmítl lacinou slitinu se
+slovy "nechci prodávat něco za 80 korun co začne zelenat"). **Pak to ale sám otočil**: *"Nevadí
+ten materiál, je to asi jedno, hlavně že to hezky vypadá, lidi budou OBEZNÁMENI s materiálem u
+popisu KAŽDÉHO produktu."* → **Materiál smí být cokoliv (i slitina/mosaz), pokud vypadá dobře —
+podmínka je, že se skutečný materiál napíše do popisu produktu.** Neopakuj starší přísnější filtr,
+řiď se touhle poslední instrukcí.
+
+### Finální 3 produkty na dnešek (potvrzené odkazy, žádné jiné nepřidávat bez pokynu)
+1. **NUOYA čtyřlístkový Cuban náramek** — `https://www.alibaba.com/product-detail/subject_1601402017682.html`
+   — materiál: slitina/mosaz (alloy/brass), MOQ 1. Barevné varianty stažené jako reference
+   (soubory `nuoya_clover_*.jpg`, `nuoya_silver_blue.jpg`, `nuoya_silver_white.jpg`,
+   `nuoya_rosegold_pink.jpg`, `nuoya_gold_green.jpg` ve scratchpadu, pokud ještě existují —
+   scratchpad je session-specific, po delší době může být pryč): **4 barvy** — stříbrná/modrá,
+   stříbrná/bílá, růžové zlato/růžová, zlatá/zelená (čtyřlístek v barvě kamínku).
+2. **925 stříbrný Cuban náramek s moissanitem** — `https://www.alibaba.com/product-detail/subject_1601807364387.html`
+   ("6mm White Gold 925 Sterling Silver VVS Moissanite Diamond Cuban Link Chain Bracelet"), MOQ 1.
+   Varianty stažené jako reference (`silver_cuban_moiss_*.jpg`, `silver_cuban_gold.jpg`,
+   `silver_cuban_whitegold.jpg`, `silver_cuban_hollow_whitegold.jpg`, `silver_cuban_hollow_gold.jpg`):
+   **2 styly** (plný / "hollow" prokládaný) **× 2 barvy kovu** (žluté zlato / bílé zlato pokovení
+   na 925 stříbře).
+3. **Moissanite náušnice (pecky)** — Temu `https://share.temu.com/lKlXoTXaSjB` — platinově pokovené,
+   MOQ efektivně 1 (Temu se dá objednat i kus). Reference: `temu_earrings_1.jpg`, `temu_earrings_2.jpg`.
+   Temu na PC házelo nerelevantní výsledky, na mobilu ne — Lukáš produkty našel na mobilu a nahodil
+   do košíku, pak jsme si to spolu prohlédli na PC. Temu má i vlastní CAPTCHA/bot-blok, který se
+   objevil při procházení — **CAPTCHA vždy řeší Lukáš sám, nikdy se to neobchází automatizovaně.**
+
+Cílová nákupní cena, kterou Lukáš zmiňoval jako orientaci: cca 500 Kč/kus.
+
+### Co přesně znamená "udělat produktové fotky" tady (9 fotek = 3 produkty × 3 fotky)
+Lukáš chce z fotky produktu (typicznav na ruce/na modelu, jak to má dodavatel na inzerátu)
+vyrobit čistou katalogovou fotku na značkovém pozadí — přesně jako se to dělalo pro hodinky (viz
+"Co přesně je Scéna 1" výše v sekci builderu: plochý onyx černý backdrop + měkká ledově modrá
+záře, ŽÁDNÁ 3D perspektiva/místnost). Dosavadní postup pro hodinky běžel přes ComfyUI na druhém
+PC (RMBG + IC-Light + kompozice, `D:\AI\customshockz\run_on_bg.py`) — **pro šperky dnes zkoušíme
+alternativu přímo přes ChatGPT** (Lukáš má placené ChatGPT Go), protože je rychlejší a nevyžaduje
+přepínat na druhý počítač:
+
+**Postup (přes `claude-in-chrome`, chatgpt.com, Lukáš přihlášený přes Apple Sign-In):**
+1. V novém chatu nahrát přes `file_upload` na file-input v composeru DVA soubory najednou:
+   (a) zdrojová fotka produktu (např. `silver_cuban_moiss_2.jpg`), (b) referenční pozadí
+   `D:\claude code\customshockz\scene1-pozadi.png` (identická kopie: `D:\AI\customshockz\scenes\scene1.png`).
+2. Napsat prompt v tomhle duchu (fungovalo, ale výsledek ještě nebyl ověřený k momentu psaní
+   tohohle handoffu):
+   > First image: a jewelry product photo of a bracelet (worn on a wrist). Second image: our
+   > brand's exact background style ("Scene 1") — a flat, seamless onyx-black backdrop with a
+   > soft icy-blue glow, no 3D room, no floor/wall perspective. Task: create a clean product-only
+   > photo of the bracelet from the first image (remove the wrist/hand entirely), placed on our
+   > Scene 1 background style from the second image. Keep the bracelet laid out in a circle (like
+   > a jewelry catalog shot), sharp focus, studio product lighting, same icy-blue glow and pure
+   > black flat background as the reference. No hands, no wrist, no 3D room.
+3. **Pozor na vyskakovací ChatGPT modaly** (např. "Get smarter answers" nabídka Think/Upgrade) —
+   umí se objevit přesně nad Send tlačítkem a schytat klik místo odeslání zprávy. Vždycky po
+   kliknutí na Send udělat screenshot a ověřit, že se zpráva fakt odeslala (title/URL tabu se
+   samo o sobě nezmění spolehlivě — vytvoří se hned s prvním nahraným souborem, ne až po odeslání).
+4. Zkontrolovat výsledek proti referenci (plochý černý podklad, ledově modrá záře, žádná 3D
+   perspektiva/stín na "podlaze") — pokud ChatGPT přidá perspektivu/stín/místnost, doupravit
+   prompt a zkusit znovu.
+5. Zopakovat pro zbylé fotky (cíl: 3 fotky na produkt × 3 produkty = 9 fotek celkem — typicky
+   different varianty barev/úhlů na produkt).
+
+### Databáze a kód pro varianty (délka/barva) — napsané, nezapojené
+Na rozdíl od hodinkového builderu (`part_variants`, globální, víceklikový wizard) potřebují tyhle
+šperky **jednoduchý jednokrokový výběr přímo na stránce produktu** (např. "Barva: zlatá/bílé
+zlato", žádný multi-step). Nový, samostatný systém:
+- **`supabase/migrations/0011_product_options.sql`** (NAPSANÁ, NESPUŠTĚNÁ) — nová tabulka
+  `product_options` (na rozdíl od `part_variants` patří KONKRÉTNÍMU `product_id`, ne globálnímu
+  typu), sloupce `group_name` (např. "Délka", "Barva"), `label`, `hex_color`, `image_url`,
+  `price_modifier`, `sort_order`, `is_active`. RLS stejná logika jako u ostatních veřejných tabulek.
+  **Spustit v Supabase SQL Editoru** (`https://supabase.com/dashboard/project/cmejkszywblqrnpyxogp/sql/new`)
+  před čímkoliv dalším.
+- **`src/types/index.ts`** — přidán typ `ProductOptionRow` (hned za `PartVariantRow`).
+- **`src/lib/data/product-options.ts`** (nový) — `getProductOptionsByProductId(productId)`, vrací
+  aktivní options seskupené podle `group_name`.
+- **`src/components/product-variants.tsx`** (nový, hotový) — `ProductVariants` komponenta: ukáže
+  všechny skupiny voleb najednou (žádný wizard), spočítá cenu (base + modifiers), přidá do košíku
+  přes stejný `useCart().addItem(...)` kontrakt jako `Configurator`/`SimpleOrderButton`
+  (`CartItem` typ beze změny — `key/productSlug/name/imageUrl/unitPriceCzk/configSummary/codAllowed`).
+  Náhledový obrázek se přepne, pokud vybraná varianta má vlastní fotku.
+- **CHYBÍ:** zapojit do `src/app/(site)/produkt/[slug]/page.tsx` — tam se pořád vždy renderuje
+  jen `SimpleOrderButton`, potřeba podmínku: pokud `getProductOptionsByProductId(product.id)`
+  vrátí neprázdný objekt, renderovat `ProductVariants` místo `SimpleOrderButton`.
+- **CHYBÍ:** import script (vzor `scripts/import-ga2100-dials.mjs` — service-role klient,
+  `.env.local`, upload fotek do Supabase Storage, insert řádků). Rozhodnout: nahrát fotky do
+  existujícího bucketu `part-images`, nebo založit nový bucket pro produktové fotky šperků.
+  Vytvoří 3 `products` řádky (kategorie `bracelets`/`bracelets`/`earrings`) + jejich
+  `product_options` řádky (viz varianty výše u každého produktu) — **vše jako draft
+  (`is_active: false`)**, počkat na Lukášovo "aktivuj".
+- **CHYBÍ:** mechanismus, kam uložit odkaz na dodavatele pro budoucí ruční objednávání
+  ("abych je mohl na zakázku objednávat") — zatím žádné DB pole na tohle není, zvážit privátní
+  poznámku (ne veřejné pole na produktu, to by bylo vidět zákazníkům).
 
 ## Co to je
 Custom G-Shock e-shop v `D:\claude code\customshockz` (na GitHubu: `shockzeu/customshockz`, branch `main`, živě na `https://www.customshockz.eu`). Next.js 16 (App Router), TypeScript, Tailwind v4, shadcn/ui, framer-motion. Paleta "Ice & Onyx" (dark default).
