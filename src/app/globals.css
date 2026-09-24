@@ -247,3 +247,149 @@
     animation-delay: 0ms !important;
   }
 }
+
+/* ------------------------------------------------------------------ */
+/*  Site intro: neon-outline logo draw (IntroAnimation component).     */
+/*  Plays once per page load, on top of the already-mounted page —     */
+/*  fading the overlay out *is* the reveal. CSS keyframes rather than   */
+/*  JS/framer-motion because this is predetermined motion that must     */
+/*  stay smooth while the rest of the page is still hydrating.          */
+/* ------------------------------------------------------------------ */
+.cs-intro-line {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-linejoin: round;
+  animation: cs-intro-draw 1.5s 0.2s cubic-bezier(0.6, 0, 0.25, 1) both;
+}
+.cs-intro-halo-line {
+  stroke: #5ce1e6;
+  stroke-width: 70;
+}
+.cs-intro-core-line {
+  stroke: #e6ffff;
+  stroke-width: 20;
+}
+@keyframes cs-intro-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cs-intro-halo {
+  opacity: 0.4;
+  animation: cs-intro-halo-fade 4s 0.2s ease-out both;
+}
+@keyframes cs-intro-halo-fade {
+  0%,
+  45% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.cs-intro-core {
+  opacity: 0;
+  animation: cs-intro-core-fade 2.3s 0.2s linear both;
+}
+@keyframes cs-intro-core-fade {
+  0%,
+  72% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.cs-intro-white {
+  animation: cs-intro-fill-in 0.5s 1.55s ease-out both;
+}
+@keyframes cs-intro-fill-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cs-intro-cyan,
+.cs-intro-cyan-glow {
+  animation: cs-intro-flicker 1s 1.8s both;
+}
+.cs-intro-cyan-glow {
+  opacity: 0.55;
+}
+.cs-intro-word-glow {
+  opacity: 0.5;
+}
+@keyframes cs-intro-flicker {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  18% {
+    opacity: 0.15;
+  }
+  30% {
+    opacity: 1;
+  }
+  42% {
+    opacity: 0.35;
+  }
+  56% {
+    opacity: 1;
+  }
+  68% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Each of the 12 wordmark letters flickers in a beat after the last one — */
+/* the actual per-letter delay is set inline from JS, same `delay = base + */
+/* i * step` pattern as the builder's `thumbDelay` stagger.                */
+.cs-intro-letter {
+  animation-name: cs-intro-flicker;
+  animation-duration: 0.6s;
+  animation-fill-mode: both;
+}
+
+.cs-intro-bloom {
+  opacity: 0.8;
+  animation: cs-intro-bloom-in 2s 1.8s ease-out both;
+}
+@keyframes cs-intro-bloom-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.8;
+  }
+}
+
+/* Delays aren't touched by the sitewide reduce-motion rule above, so     */
+/* without this the intro would still sit through ~4s of staggered        */
+/* delays before its (now near-instant) animations resolve.               */
+@media (prefers-reduced-motion: reduce) {
+  .cs-intro-line,
+  .cs-intro-halo,
+  .cs-intro-core,
+  .cs-intro-white,
+  .cs-intro-cyan,
+  .cs-intro-cyan-glow,
+  .cs-intro-letter,
+  .cs-intro-bloom {
+    animation-delay: 0ms !important;
+  }
+}

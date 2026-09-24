@@ -13,6 +13,12 @@ export const siteConfig = {
   email: "customshockzz@gmail.com",
   /** Bank transfer target — shown to customers who pick that payment method. */
   bankAccount: "112200621/5500",
+  /**
+   * Self-imposed launch deadline (2026-09-25). Until this passes, `proxy.ts`
+   * rewrites the whole storefront to `/pripravujeme`. Delete this field,
+   * `src/proxy.ts`, and `src/app/pripravujeme/` once the countdown is over.
+   */
+  launchAt: "2026-09-25T18:00:00+02:00",
 } as const;
 
 export type NavItem = {
