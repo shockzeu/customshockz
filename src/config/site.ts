@@ -18,7 +18,7 @@ export const siteConfig = {
    * rewrites the whole storefront to `/pripravujeme`. Delete this field,
    * `src/proxy.ts`, and `src/app/pripravujeme/` once the countdown is over.
    */
-  launchAt: "2026-09-25T18:00:00+02:00",
+  launchAt: "2026-09-25T17:45:00+02:00",
 } as const;
 
 export type NavItem = {
