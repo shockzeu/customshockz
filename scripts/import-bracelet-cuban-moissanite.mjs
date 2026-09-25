@@ -61,8 +61,8 @@ const PRODUCT = {
   name: "Iced Cuban náramek – moissanit, 925 stříbro",
   slug: SLUG,
   description:
-    "Cuban link náramek se zalitými (pavé) články, hustě osazený broušenými moissanity (VVS) " +
-    "v drápkovém osazení — plně \"iced out\" vzhled. Materiál: 925 sterlingové stříbro. " +
+    "Cuban link náramek se zalitými (pavé) články, šířka 8 mm, hustě osazený broušenými moissanity " +
+    "(VVS) v drápkovém osazení — plně \"iced out\" vzhled. Čisté 925 stříbro, žádné zlato. " +
     "Bezpečnostní zapínání. Vyber si délku podle svého zápěstí.",
   material: "925 stříbro",
   base_price: 360000, // 3 600 Kč = nejkratší délka (15 cm)
