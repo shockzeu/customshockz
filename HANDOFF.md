@@ -3,6 +3,23 @@
 ## ▶️ Začni tady v nové session
 Řekni Claude Code: **"přečti si HANDOFF.md a pojďme pokračovat"**.
 
+### 🆕 2026-09-25 ráno — hotovo a live (novější než zbytek dokumentu)
+- **Migrace `0011_product_options` i `0012_product_material` SPUŠTĚNÉ** (tabulka `product_options`
+  existuje, `products.material` existuje). Tip: SQL do Supabase editoru vkládat přes
+  `window.monaco.editor.getModels()[0].setValue(sql)` v `javascript_tool` — psaní klávesnicí
+  kazí autocomplete a klávesové zkratky dashboardu přeskakují na jiné stránky.
+- **Admin:** trvalé mazání produktů (koš), pole **Materiál** (odznak s ikonou na stránce produktu),
+  **editor variant** přímo v okně produktu (skupina/popisek/barva/příplatek, full-replace přes
+  `saveProductOptions`), **řazení fotek** (šipky + drag&drop, č. 1 = titulní), stránka
+  **`/admin/catalog`** (náhled všech produktů vč. draftů).
+- **Produkty živé:** *Iced Clover náramek* (mosaz + zirkon, 4 barvy s vlastní fotkou × délky
+  18/20,5/23 cm, Lukáš ceny upravil na 849 Kč základ) a *Iced Stud moissanite náušnice* (925 stříbro).
+  Import náramku: `scripts/import-bracelet-iced-clover.mjs`.
+- **Další na řadě:** Lukáš dodělává fotky dalších ~4 náramků (1 fotka na barvu, složka
+  `D:\Produktove fotky na stranku Ready to use\`), druhé náušnice a pak přívěsky. Délky uvádět
+  jen v cm (žádné palce). Plánuje pořadí fotek: 1. AI fotka, 2. reálná na bílém, 3. na ruce/další AI.
+- Countdown lock se vypne sám 25.9. 18:00.
+
 ### ⏳ DŮLEŽITÉ: web je (možná pořád) schválně zamčený countdownem
 Lukáš si na sebe udělal ADHD-nátlakový trik: **od 2026-09-24 je celý veřejný web
 `customshockz.eu` schválně přepnutý na "coming soon" countdown banner** (neonové intro logo →

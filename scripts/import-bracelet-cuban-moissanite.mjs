@@ -1,14 +1,16 @@
 /**
- * One-off import: 925 silver moissanite Cuban link bracelet (full / "plný"
- * style) as a DRAFT product with per-product options (Barva, Délka v cm).
+ * One-off import: 925 silver moissanite Cuban link bracelet as a DRAFT
+ * product with per-product options (Délka only — no color variant, all
+ * photos are the same silver/white-gold finish).
  *
- * Prices: supplier price x 2.0, rounded to steps of 300 CZK
- * (15 cm = 3 490 Kč ... 21,5 cm = 4 990 Kč). `price_modifier` is in haléře.
- * Inserted as is_active = false — activate from /admin/products when told to.
+ * Prices: supplier price x 2.0, rounded to steps of 300 CZK.
+ * 15 cm 3 600 Kč ... 21,5 cm 5 100 Kč. `price_modifier` is in haléře,
+ * relative to the 15 cm base price. Inserted as is_active = false —
+ * activate from /admin/products when told to.
  *
- * Requires migration 0011_product_options.sql to be applied first.
+ * Requires migrations 0011_product_options.sql and 0012_product_material.sql.
  *
- * Usage: node scripts/import-bracelet-cuban-moissanite.mjs <photo1> [photo2] [photo3]
+ * Usage: node scripts/import-bracelet-cuban-moissanite.mjs <foto1> [foto2] [foto3]
  *   photos = finished product shots; the first becomes the main image.
  */
 import { createClient } from "@supabase/supabase-js";
@@ -58,10 +60,11 @@ const PRODUCT = {
   name: "Iced Cuban náramek – moissanit, 925 stříbro",
   slug: SLUG,
   description:
-    "Cuban link náramek se zalitými články, osazený moissanity (VVS) v drápkovém osazení. " +
-    "Materiál: 925 sterlingové stříbro, barva žluté zlato nebo bílé zlato (povrchová úprava stříbra). " +
-    "Šířka článků 6 mm, bezpečnostní zapínání. Vyber si barvu a délku podle svého zápěstí.",
-  base_price: 349000, // 3 490 Kč = nejkratší délka (15 cm)
+    "Cuban link náramek se zalitými (pavé) články, hustě osazený broušenými moissanity (VVS) " +
+    "v drápkovém osazení — plně \"iced out\" vzhled. Materiál: 925 sterlingové stříbro. " +
+    "Bezpečnostní zapínání. Vyber si délku podle svého zápěstí.",
+  material: "925 stříbro",
+  base_price: 360000, // 3 600 Kč = nejkratší délka (15 cm)
   category: "bracelets",
   in_stock: true,
   is_active: false,
@@ -70,13 +73,11 @@ const PRODUCT = {
 };
 
 const OPTIONS = [
-  { group_name: "Barva", label: "Zlatá", hex_color: "#D4AF37", price_modifier: 0 },
-  { group_name: "Barva", label: "Bílé zlato", hex_color: "#E8E8EC", price_modifier: 0 },
   { group_name: "Délka", label: "15 cm", price_modifier: 0 },
   { group_name: "Délka", label: "16,5 cm", price_modifier: 30000 },
   { group_name: "Délka", label: "18 cm", price_modifier: 60000 },
   { group_name: "Délka", label: "19 cm", price_modifier: 90000 },
-  { group_name: "Délka", label: "20 cm", price_modifier: 120000 },
+  { group_name: "Délka", label: "20,5 cm", price_modifier: 120000 },
   { group_name: "Délka", label: "21,5 cm", price_modifier: 150000 },
 ];
 
