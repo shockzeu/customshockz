@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Watch, Palette, ArrowRight, TriangleAlert, ShoppingBag } from "lucide-react";
+import { Watch, Palette, ArrowRight, TriangleAlert, ShoppingBag, LayoutGrid } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/format";
@@ -110,7 +110,7 @@ export default async function AdminDashboardPage() {
         </>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ManageCard
           href="/admin/orders"
           title="Objednávky"
@@ -122,6 +122,12 @@ export default async function AdminDashboardPage() {
           title="Produkty"
           description="Hodinky i šperky, ceny a dostupnost."
           icon={<Watch className="size-5" />}
+        />
+        <ManageCard
+          href="/admin/catalog"
+          title="Katalog"
+          description="Náhled fotek, popisků a variant, jak to vypadá na webu."
+          icon={<LayoutGrid className="size-5" />}
         />
         <ManageCard
           href="/admin/parts"
