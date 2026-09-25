@@ -3,12 +3,13 @@
 import { Fragment, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Pencil, EyeOff, Eye, Rocket } from "lucide-react";
+import { Plus, Pencil, EyeOff, Eye, Rocket, Trash2 } from "lucide-react";
 
 import { PRODUCT_CATEGORY_LABELS, type ProductRow } from "@/types";
 import { formatPrice } from "@/lib/format";
 import {
   setProductActive,
+  deleteProduct,
   publishBatch,
 } from "@/app/admin/(panel)/products/actions";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,25 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
         return;
       }
       toast.success(p.is_active ? "Produkt skryt" : "Produkt obnoven");
+      router.refresh();
+    });
+  }
+
+  function onDelete(p: ProductRow) {
+    if (
+      !window.confirm(
+        `Trvale smazat „${p.name}“? Tohle se nedá vzít zpět.`,
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      const res = await deleteProduct(p.id);
+      if (res.error) {
+        toast.error("Smazání selhalo", { description: res.error });
+        return;
+      }
+      toast.success("Produkt smazán");
       router.refresh();
     });
   }
@@ -121,6 +141,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                       product={section.product}
                       pending={pending}
                       onToggleActive={toggleActive}
+                      onDelete={onDelete}
                     />
                   );
                 }
@@ -159,6 +180,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                         product={p}
                         pending={pending}
                         onToggleActive={toggleActive}
+                        onDelete={onDelete}
                       />
                     ))}
                   </Fragment>
@@ -176,10 +198,12 @@ function ProductRowItem({
   product: p,
   pending,
   onToggleActive,
+  onDelete,
 }: {
   product: ProductRow;
   pending: boolean;
   onToggleActive: (p: ProductRow) => void;
+  onDelete: (p: ProductRow) => void;
 }) {
   return (
     <TableRow className={p.is_active ? "" : "opacity-55"}>
@@ -221,6 +245,15 @@ function ProductRowItem({
             onClick={() => onToggleActive(p)}
           >
             {p.is_active ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Smazat"
+            disabled={pending}
+            onClick={() => onDelete(p)}
+          >
+            <Trash2 className="text-destructive size-4" />
           </Button>
         </div>
       </TableCell>

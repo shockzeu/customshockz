@@ -24,8 +24,8 @@ export default async function AdminProductsPage() {
           Produkty
         </h1>
         <p className="text-muted-foreground mt-1 text-sm">
-          Hodinky i šperky — vyber kategorii při přidání. Mazání je „měkké"
-          — produkt se jen skryje.
+          Hodinky i šperky — vyber kategorii při přidání. Ikonou oka produkt
+          jen skryješ/obnovíš, koš ho trvale smaže.
         </p>
       </div>
 

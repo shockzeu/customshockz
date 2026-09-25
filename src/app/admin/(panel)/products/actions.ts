@@ -148,7 +148,25 @@ export async function publishBatch(batch: string): Promise<ActionResult> {
   }
 }
 
-/** Soft delete / restore — we never hard-delete. */
+/** Permanently deletes a product row (product_options cascade with it). */
+export async function deleteProduct(id: string): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+    const { error } = await supabase.from("products").delete().eq("id", id);
+    if (error) return { error: error.message };
+
+    revalidatePath("/admin/products");
+    revalidatePath("/admin");
+    revalidatePath("/");
+    revalidatePath("/hodinky");
+    revalidatePath("/sperky");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Neznámá chyba" };
+  }
+}
+
+/** Soft delete / restore — for hiding products without losing them. */
 export async function setProductActive(
   id: string,
   isActive: boolean,
