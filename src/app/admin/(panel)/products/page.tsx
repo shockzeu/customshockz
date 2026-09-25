@@ -1,7 +1,7 @@
 import { TriangleAlert } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
-import type { ProductRow } from "@/types";
+import type { ProductOptionRow, ProductRow } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductsTable } from "@/components/admin/products-table";
 
@@ -12,10 +12,18 @@ export const metadata = {
 
 export default async function AdminProductsPage() {
   const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [{ data, error }, { data: options }] = await Promise.all([
+    supabase.from("products").select("*").order("created_at", { ascending: false }),
+    supabase
+      .from("product_options")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+  ]);
+
+  const optionsByProduct: Record<string, ProductOptionRow[]> = {};
+  for (const row of (options as ProductOptionRow[]) ?? []) {
+    (optionsByProduct[row.product_id] ??= []).push(row);
+  }
 
   return (
     <div className="space-y-6">
@@ -42,7 +50,10 @@ export default async function AdminProductsPage() {
           </CardContent>
         </Card>
       ) : (
-        <ProductsTable products={(data as ProductRow[]) ?? []} />
+        <ProductsTable
+          products={(data as ProductRow[]) ?? []}
+          optionsByProduct={optionsByProduct}
+        />
       )}
     </div>
   );

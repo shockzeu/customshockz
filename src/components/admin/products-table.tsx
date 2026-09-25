@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Plus, Pencil, EyeOff, Eye, Rocket, Trash2 } from "lucide-react";
 
-import { PRODUCT_CATEGORY_LABELS, type ProductRow } from "@/types";
+import {
+  PRODUCT_CATEGORY_LABELS,
+  type ProductOptionRow,
+  type ProductRow,
+} from "@/types";
 import { formatPrice } from "@/lib/format";
 import {
   setProductActive,
@@ -49,7 +53,13 @@ function toSections(products: ProductRow[]): Section[] {
   return sections;
 }
 
-export function ProductsTable({ products }: { products: ProductRow[] }) {
+export function ProductsTable({
+  products,
+  optionsByProduct,
+}: {
+  products: ProductRow[];
+  optionsByProduct: Record<string, ProductOptionRow[]>;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
@@ -139,6 +149,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                     <ProductRowItem
                       key={section.product.id}
                       product={section.product}
+                      options={optionsByProduct[section.product.id] ?? []}
                       pending={pending}
                       onToggleActive={toggleActive}
                       onDelete={onDelete}
@@ -178,6 +189,7 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
                       <ProductRowItem
                         key={p.id}
                         product={p}
+                        options={optionsByProduct[p.id] ?? []}
                         pending={pending}
                         onToggleActive={toggleActive}
                         onDelete={onDelete}
@@ -196,11 +208,13 @@ export function ProductsTable({ products }: { products: ProductRow[] }) {
 
 function ProductRowItem({
   product: p,
+  options,
   pending,
   onToggleActive,
   onDelete,
 }: {
   product: ProductRow;
+  options: ProductOptionRow[];
   pending: boolean;
   onToggleActive: (p: ProductRow) => void;
   onDelete: (p: ProductRow) => void;
@@ -232,7 +246,7 @@ function ProductRowItem({
       </TableCell>
       <TableCell>
         <div className="flex justify-end gap-1">
-          <ProductDialog product={p}>
+          <ProductDialog product={p} options={options}>
             <Button variant="ghost" size="icon" aria-label="Upravit">
               <Pencil className="size-4" />
             </Button>

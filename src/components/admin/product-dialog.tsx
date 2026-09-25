@@ -9,9 +9,15 @@ import {
   PRODUCT_CATEGORIES,
   PRODUCT_CATEGORY_LABELS,
   type ProductCategory,
+  type ProductOptionRow,
   type ProductRow,
 } from "@/types";
-import { saveProduct } from "@/app/admin/(panel)/products/actions";
+import { saveProduct, saveProductOptions } from "@/app/admin/(panel)/products/actions";
+import {
+  ProductVariantsEditor,
+  optionRowsToDrafts,
+  type VariantDraft,
+} from "@/components/admin/product-variants-editor";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,9 +52,11 @@ function slugify(value: string) {
 
 export function ProductDialog({
   product,
+  options = [],
   children,
 }: {
   product?: ProductRow;
+  options?: ProductOptionRow[];
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -78,6 +86,9 @@ export function ProductDialog({
         : [];
   const [existingUrls, setExistingUrls] = useState<string[]>(initialUrls);
   const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [variants, setVariants] = useState<VariantDraft[]>(() =>
+    optionRowsToDrafts(options),
+  );
   const [saving, setSaving] = useState(false);
 
   // Preview entries in display order: kept existing photos first, then newly
@@ -115,6 +126,7 @@ export function ProductDialog({
       setCodAllowed(false);
       setExistingUrls([]);
       setNewFiles([]);
+      setVariants([]);
       if (fileRef.current) fileRef.current.value = "";
     }
   }
@@ -151,11 +163,13 @@ export function ProductDialog({
       }
     }
 
+    const finalSlug = slug || slugify(name);
+
     const res = await saveProduct({
       id: product?.id,
       name,
       category,
-      slug: slug || slugify(name),
+      slug: finalSlug,
       description,
       material,
       imageUrls: [...existingUrls, ...uploadedUrls],
@@ -165,10 +179,28 @@ export function ProductDialog({
       codAllowed,
     });
 
+    if (res.error || !res.id) {
+      setSaving(false);
+      toast.error("Uložení selhalo", { description: res.error });
+      return;
+    }
+
+    const optionsRes = await saveProductOptions(
+      res.id,
+      finalSlug,
+      variants.map((v) => ({
+        groupName: v.groupName,
+        label: v.label,
+        hexColor: v.hexColor || null,
+        imageUrl: v.imageUrl,
+        priceModifierCzk: Number(v.priceModifier) || 0,
+      })),
+    );
+
     setSaving(false);
 
-    if (res.error) {
-      toast.error("Uložení selhalo", { description: res.error });
+    if (optionsRes.error) {
+      toast.error("Uložení variant selhalo", { description: optionsRes.error });
       return;
     }
 
@@ -187,7 +219,7 @@ export function ProductDialog({
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <form onSubmit={onSubmit}>
           <DialogHeader>
             <DialogTitle>
@@ -279,6 +311,11 @@ export function ProductDialog({
                 onChange={(e) => setPrice(e.target.value)}
                 placeholder="12900"
               />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Varianty (barva, délka, ...)</Label>
+              <ProductVariantsEditor value={variants} onChange={setVariants} />
             </div>
 
             <div className="grid gap-2">

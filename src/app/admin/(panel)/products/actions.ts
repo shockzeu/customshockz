@@ -5,6 +5,14 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { ProductCategory } from "@/types";
 
+export type ProductOptionInput = {
+  groupName: string;
+  label: string;
+  hexColor: string | null;
+  imageUrl: string | null;
+  priceModifierCzk: number; // whole Kč, +/-, relative to the product's base price
+};
+
 const DIACRITICS_RE = /[̀-ͯ]/g;
 
 function slugify(value: string) {
@@ -32,6 +40,7 @@ export type ProductInput = {
 };
 
 type ActionResult = { error?: string };
+type SaveProductResult = { error?: string; id?: string };
 
 async function requireUser() {
   const supabase = await createClient();
@@ -42,7 +51,9 @@ async function requireUser() {
   return supabase;
 }
 
-export async function saveProduct(input: ProductInput): Promise<ActionResult> {
+export async function saveProduct(
+  input: ProductInput,
+): Promise<SaveProductResult> {
   try {
     const supabase = await requireUser();
 
@@ -65,17 +76,69 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
     };
 
     const res = input.id
-      ? await supabase.from("products").update(payload).eq("id", input.id)
-      : await supabase.from("products").insert(payload);
+      ? await supabase
+          .from("products")
+          .update(payload)
+          .eq("id", input.id)
+          .select("id")
+          .single()
+      : await supabase.from("products").insert(payload).select("id").single();
 
     if (res.error) return { error: res.error.message };
 
     revalidatePath("/admin/products");
+    revalidatePath("/admin/catalog");
     revalidatePath("/admin");
     revalidatePath("/");
     revalidatePath("/hodinky");
     revalidatePath("/sperky");
     revalidatePath(`/produkt/${slug}`);
+    return { id: res.data.id as string };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Neznámá chyba" };
+  }
+}
+
+/**
+ * Full replace of a product's options (color/length/...): deletes everything
+ * it currently has and inserts the given list, in order. Called right after
+ * `saveProduct` from the same dialog so price/variant edits land together.
+ */
+export async function saveProductOptions(
+  productId: string,
+  productSlug: string,
+  options: ProductOptionInput[],
+): Promise<ActionResult> {
+  try {
+    const supabase = await requireUser();
+
+    const del = await supabase
+      .from("product_options")
+      .delete()
+      .eq("product_id", productId);
+    if (del.error) return { error: del.error.message };
+
+    const rows = options
+      .filter((o) => o.groupName.trim() && o.label.trim())
+      .map((o, i) => ({
+        product_id: productId,
+        group_name: o.groupName.trim(),
+        label: o.label.trim(),
+        hex_color: o.hexColor?.trim() || null,
+        image_url: o.imageUrl,
+        price_modifier: Math.round(o.priceModifierCzk * 100),
+        sort_order: i,
+        is_active: true,
+      }));
+
+    if (rows.length > 0) {
+      const ins = await supabase.from("product_options").insert(rows);
+      if (ins.error) return { error: ins.error.message };
+    }
+
+    revalidatePath("/admin/products");
+    revalidatePath("/admin/catalog");
+    revalidatePath(`/produkt/${productSlug}`);
     return {};
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Neznámá chyba" };
