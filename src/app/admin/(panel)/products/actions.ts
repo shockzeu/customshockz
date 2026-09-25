@@ -22,6 +22,7 @@ export type ProductInput = {
   category: ProductCategory;
   slug: string;
   description: string;
+  material: string;
   /** Every photo in display order. First one doubles as the cover photo everywhere else in the app. */
   imageUrls: string[];
   basePriceCzk: number; // whole CZK from the form
@@ -54,6 +55,7 @@ export async function saveProduct(input: ProductInput): Promise<ActionResult> {
       category: input.category,
       slug,
       description: input.description.trim() || null,
+      material: input.material.trim() || null,
       image_url: input.imageUrls[0] ?? null,
       image_urls: input.imageUrls,
       base_price: Math.round(input.basePriceCzk * 100), // → haléře

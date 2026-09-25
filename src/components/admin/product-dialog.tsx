@@ -63,6 +63,7 @@ export function ProductDialog({
   const [slug, setSlug] = useState(product?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(isEdit);
   const [description, setDescription] = useState(product?.description ?? "");
+  const [material, setMaterial] = useState(product?.material ?? "");
   const [price, setPrice] = useState(
     product ? String(product.base_price / 100) : "",
   );
@@ -107,6 +108,7 @@ export function ProductDialog({
       setSlug("");
       setSlugTouched(false);
       setDescription("");
+      setMaterial("");
       setPrice("");
       setInStock(true);
       setActive(true);
@@ -155,6 +157,7 @@ export function ProductDialog({
       category,
       slug: slug || slugify(name),
       description,
+      material,
       imageUrls: [...existingUrls, ...uploadedUrls],
       basePriceCzk: Number(price) || 0,
       inStock,
@@ -249,6 +252,19 @@ export function ProductDialog({
                 placeholder="Plně iced-out CasiOak s ručně sazenými kameny…"
                 rows={3}
               />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="p-material">Materiál</Label>
+              <Input
+                id="p-material"
+                value={material}
+                onChange={(e) => setMaterial(e.target.value)}
+                placeholder="925 stříbro"
+              />
+              <p className="text-muted-foreground text-xs">
+                Zobrazí se jako odznak na stránce produktu.
+              </p>
             </div>
 
             <div className="grid gap-2">

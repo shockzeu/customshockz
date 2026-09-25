@@ -19,6 +19,8 @@ export type Product = {
   priceCzk: number;
   currency: "CZK";
   description: string;
+  /** Real material, e.g. "925 stříbro", "Mosaz + zirkon" — shown as a badge. */
+  material: string;
   imageUrl: string | null;
   /** Every product photo in display order. Empty when the product has none. */
   imageUrls: string[];
@@ -61,6 +63,7 @@ export type ProductRow = {
   name: string;
   slug: string | null;
   description: string | null;
+  material: string | null;
   image_url: string | null;
   /** Every product photo in display order; `image_url` mirrors the first entry. */
   image_urls: string[];

@@ -11,6 +11,7 @@ function toProduct(row: ProductRow): Product {
     priceCzk: row.base_price,
     currency: "CZK",
     description: row.description ?? "",
+    material: row.material ?? "",
     imageUrl: row.image_url,
     imageUrls: row.image_urls?.length ? row.image_urls : row.image_url ? [row.image_url] : [],
     inStock: row.in_stock,

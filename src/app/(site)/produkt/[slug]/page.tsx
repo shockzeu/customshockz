@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Gem } from "lucide-react";
 
 import { getProductBySlug } from "@/lib/data/products";
 import { getProductOptionsByProductId } from "@/lib/data/product-options";
@@ -72,6 +73,12 @@ export default async function ProductPage({
           <p className="text-ice mt-3 text-xl font-semibold">
             {formatPrice(product.priceCzk)}
           </p>
+          {product.material && (
+            <Badge variant="secondary" className="mt-3 gap-1.5">
+              <Gem className="size-3.5" />
+              {product.material}
+            </Badge>
+          )}
           {product.description && (
             <p className="text-muted-foreground mt-4 text-sm sm:text-base">
               {product.description}
