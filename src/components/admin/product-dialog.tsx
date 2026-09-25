@@ -93,7 +93,7 @@ export function ProductDialog({
     initialUrls.map((url, i) => ({ key: `${i}-${url}`, url })),
   );
   const [variants, setVariants] = useState<VariantDraft[]>(() =>
-    optionRowsToDrafts(options),
+    optionRowsToDrafts(options, product ? product.base_price / 100 : 0),
   );
   const [saving, setSaving] = useState(false);
   const blobUrls = useRef(new Set<string>());
@@ -204,6 +204,7 @@ export function ProductDialog({
       return;
     }
 
+    const basePriceCzk = Number(price) || 0;
     const optionsRes = await saveProductOptions(
       res.id,
       finalSlug,
@@ -212,7 +213,7 @@ export function ProductDialog({
         label: v.label,
         hexColor: v.hexColor || null,
         imageUrl: v.imageUrl,
-        priceModifierCzk: Number(v.priceModifier) || 0,
+        priceModifierCzk: (Number(v.priceCzk) || 0) - basePriceCzk,
       })),
     );
 
@@ -334,7 +335,11 @@ export function ProductDialog({
 
             <div className="grid gap-2">
               <Label>Varianty (barva, délka, ...)</Label>
-              <ProductVariantsEditor value={variants} onChange={setVariants} />
+              <ProductVariantsEditor
+                value={variants}
+                onChange={setVariants}
+                basePriceCzk={Number(price) || 0}
+              />
             </div>
 
             <div className="grid gap-2">

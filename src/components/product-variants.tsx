@@ -100,73 +100,81 @@ export function ProductVariants({
         </div>
       )}
 
-      {groupNames.map((group) => (
-        <div key={group} className="grid gap-2">
-          <p className="text-sm font-semibold tracking-wide uppercase">
-            {group}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {optionsByGroup[group].map((option) => {
-              const isActive = selected[group] === option.id;
+      {groupNames.map((group) => {
+        const opts = optionsByGroup[group];
+        // Only show a price per option when this group actually changes the
+        // price — otherwise every button would repeat the same base price.
+        // Shown as the option's own total (base + its modifier), never as a
+        // "+X Kč" surcharge, so e.g. two lengths just read as two prices.
+        const showPrice = opts.some((o) => o.price_modifier !== 0);
 
-              if (option.image_url) {
+        return (
+          <div key={group} className="grid gap-2">
+            <p className="text-sm font-semibold tracking-wide uppercase">
+              {group}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {opts.map((option) => {
+                const isActive = selected[group] === option.id;
+
+                if (option.image_url) {
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      title={option.label}
+                      aria-label={option.label}
+                      onClick={() => selectOption(group, option)}
+                      className={cn(
+                        "relative size-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
+                        isActive
+                          ? "border-ice-blue"
+                          : "border-border/60 hover:border-border",
+                      )}
+                    >
+                      <Image
+                        src={option.image_url}
+                        alt={option.label}
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    </button>
+                  );
+                }
+
                 return (
                   <button
                     key={option.id}
                     type="button"
-                    title={option.label}
-                    aria-label={option.label}
                     onClick={() => selectOption(group, option)}
                     className={cn(
-                      "relative size-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
+                      "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
                       isActive
-                        ? "border-ice-blue"
-                        : "border-border/60 hover:border-border",
+                        ? "border-ice-blue bg-ice-blue/10 text-foreground"
+                        : "border-border/60 text-muted-foreground hover:border-border hover:text-foreground",
                     )}
                   >
-                    <Image
-                      src={option.image_url}
-                      alt={option.label}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
+                    {option.hex_color && (
+                      <span
+                        className="size-4 shrink-0 rounded-full border border-white/20"
+                        style={{ backgroundColor: option.hex_color }}
+                        aria-hidden
+                      />
+                    )}
+                    <span>{option.label}</span>
+                    {showPrice && (
+                      <span className="text-xs opacity-70">
+                        {formatPrice(basePriceCzk + option.price_modifier)}
+                      </span>
+                    )}
                   </button>
                 );
-              }
-
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => selectOption(group, option)}
-                  className={cn(
-                    "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
-                    isActive
-                      ? "border-ice-blue bg-ice-blue/10 text-foreground"
-                      : "border-border/60 text-muted-foreground hover:border-border hover:text-foreground",
-                  )}
-                >
-                  {option.hex_color && (
-                    <span
-                      className="size-4 shrink-0 rounded-full border border-white/20"
-                      style={{ backgroundColor: option.hex_color }}
-                      aria-hidden
-                    />
-                  )}
-                  <span>{option.label}</span>
-                  {option.price_modifier !== 0 && (
-                    <span className="text-xs opacity-70">
-                      {option.price_modifier > 0 ? "+" : ""}
-                      {formatPrice(option.price_modifier)}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
 
       <Button
         size="lg"

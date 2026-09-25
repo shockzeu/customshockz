@@ -12,17 +12,20 @@ export type VariantDraft = {
   groupName: string;
   label: string;
   hexColor: string;
-  priceModifier: string; // Kč, as typed
+  priceCzk: string; // this variant's own total price, as typed
   imageUrl: string | null;
 };
 
-export function optionRowsToDrafts(rows: ProductOptionRow[]): VariantDraft[] {
+export function optionRowsToDrafts(
+  rows: ProductOptionRow[],
+  basePriceCzk: number,
+): VariantDraft[] {
   return rows.map((r) => ({
     key: r.id,
     groupName: r.group_name,
     label: r.label,
     hexColor: r.hex_color ?? "",
-    priceModifier: String(r.price_modifier / 100),
+    priceCzk: String(basePriceCzk + r.price_modifier / 100),
     imageUrl: r.image_url,
   }));
 }
@@ -33,13 +36,20 @@ export function optionRowsToDrafts(rows: ProductOptionRow[]): VariantDraft[] {
  * than nested per-group clusters, and every product here has at most two
  * groups anyway. Photos stay whatever they were at import; there's no
  * upload control here, just create/edit/remove rows and their price.
+ *
+ * Each row's price is its own total (what the customer actually pays for
+ * that option), not a "+X Kč" surcharge — Lukáš found the surcharge framing
+ * made a small size difference look like a huge markup. The product dialog
+ * converts to/from the stored price_modifier at the base price.
  */
 export function ProductVariantsEditor({
   value,
   onChange,
+  basePriceCzk,
 }: {
   value: VariantDraft[];
   onChange: (next: VariantDraft[]) => void;
+  basePriceCzk: number;
 }) {
   function update(key: string, patch: Partial<VariantDraft>) {
     onChange(value.map((v) => (v.key === key ? { ...v, ...patch } : v)));
@@ -58,7 +68,7 @@ export function ProductVariantsEditor({
         groupName: lastGroup,
         label: "",
         hexColor: "",
-        priceModifier: "0",
+        priceCzk: String(basePriceCzk),
         imageUrl: null,
       },
     ]);
@@ -73,7 +83,7 @@ export function ProductVariantsEditor({
               <span>Skupina</span>
               <span>Popisek</span>
               <span>Barva</span>
-              <span>Příplatek (Kč)</span>
+              <span>Cena (Kč)</span>
               <span />
             </div>
             {value.map((v) => (
@@ -98,11 +108,9 @@ export function ProductVariantsEditor({
                 <Input
                   type="number"
                   step={1}
-                  value={v.priceModifier}
-                  onChange={(e) =>
-                    update(v.key, { priceModifier: e.target.value })
-                  }
-                  placeholder="0"
+                  value={v.priceCzk}
+                  onChange={(e) => update(v.key, { priceCzk: e.target.value })}
+                  placeholder={String(basePriceCzk)}
                 />
                 <Button
                   type="button"
@@ -124,9 +132,9 @@ export function ProductVariantsEditor({
       </Button>
       {value.length > 0 && (
         <p className="text-muted-foreground text-xs">
-          Příplatek se přičítá k základní ceně (u nejlevnější varianty bývá 0).
-          Barva je nepovinná — nech prázdné, pokud varianta nemá barevný
-          odznak.
+          Cena je celková částka za tuhle konkrétní variantu (ne příplatek
+          navíc k základní ceně). Barva je nepovinná — nech prázdné, pokud
+          varianta nemá barevný odznak.
         </p>
       )}
     </div>
