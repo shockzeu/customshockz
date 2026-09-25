@@ -1,9 +1,9 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Upload, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2, Upload, X } from "lucide-react";
 
 import {
   PRODUCT_CATEGORIES,
@@ -19,6 +19,7 @@ import {
   type VariantDraft,
 } from "@/components/admin/product-variants-editor";
 import { createClient } from "@/lib/supabase/client";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,6 +41,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+type PhotoItem = { key: string; url: string; file?: File };
 
 function slugify(value: string) {
   return value
@@ -84,32 +87,45 @@ export function ProductDialog({
       : product?.image_url
         ? [product.image_url]
         : [];
-  const [existingUrls, setExistingUrls] = useState<string[]>(initialUrls);
-  const [newFiles, setNewFiles] = useState<File[]>([]);
+  // One ordered list for already-uploaded photos and newly picked files, so
+  // they can be interleaved/reordered freely; `file` marks the ones still to upload.
+  const [photos, setPhotos] = useState<PhotoItem[]>(() =>
+    initialUrls.map((url, i) => ({ key: `${i}-${url}`, url })),
+  );
   const [variants, setVariants] = useState<VariantDraft[]>(() =>
     optionRowsToDrafts(options),
   );
   const [saving, setSaving] = useState(false);
+  const blobUrls = useRef(new Set<string>());
+  const dragFrom = useRef<number | null>(null);
 
-  // Preview entries in display order: kept existing photos first, then newly
-  // picked files (as local object URLs). Memoized on `newFiles` itself so a
-  // blob URL is only (re)created when the file list actually changes, not on
-  // every render — the cleanup below then reliably revokes the exact set it
-  // created instead of leaking one per re-render.
-  const newFilePreviews = useMemo(
-    () => newFiles.map((f) => URL.createObjectURL(f)),
-    [newFiles],
-  );
   useEffect(() => {
-    return () => newFilePreviews.forEach((u) => URL.revokeObjectURL(u));
-  }, [newFilePreviews]);
-  const previews = [...existingUrls, ...newFilePreviews];
+    const urls = blobUrls.current;
+    return () => urls.forEach((u) => URL.revokeObjectURL(u));
+  }, []);
 
-  function removeExisting(url: string) {
-    setExistingUrls((u) => u.filter((x) => x !== url));
+  function addFiles(files: File[]) {
+    const items = files.map((file) => {
+      const url = URL.createObjectURL(file);
+      blobUrls.current.add(url);
+      return { key: url, url, file };
+    });
+    setPhotos((p) => [...p, ...items]);
   }
-  function removeNewFile(index: number) {
-    setNewFiles((f) => f.filter((_, i) => i !== index));
+
+  function removePhoto(key: string) {
+    setPhotos((p) => p.filter((x) => x.key !== key));
+    if (blobUrls.current.delete(key)) URL.revokeObjectURL(key);
+  }
+
+  function movePhoto(from: number, to: number) {
+    setPhotos((p) => {
+      if (from === to || to < 0 || to >= p.length) return p;
+      const next = [...p];
+      const [item] = next.splice(from, 1);
+      next.splice(to, 0, item);
+      return next;
+    });
   }
 
   function resetForNew() {
@@ -124,8 +140,9 @@ export function ProductDialog({
       setInStock(true);
       setActive(true);
       setCodAllowed(false);
-      setExistingUrls([]);
-      setNewFiles([]);
+      blobUrls.current.forEach((u) => URL.revokeObjectURL(u));
+      blobUrls.current.clear();
+      setPhotos([]);
       setVariants([]);
       if (fileRef.current) fileRef.current.value = "";
     }
@@ -140,27 +157,29 @@ export function ProductDialog({
     e.preventDefault();
     setSaving(true);
 
-    const uploadedUrls: string[] = [];
+    const imageUrls: string[] = [];
+    const supabase = createClient();
 
-    if (newFiles.length) {
-      const supabase = createClient();
-      for (const f of newFiles) {
-        const ext = f.name.split(".").pop() ?? "jpg";
-        const path = `${crypto.randomUUID()}.${ext}`;
-        const { error: upErr } = await supabase.storage
-          .from("product-images")
-          .upload(path, f, { upsert: false });
-
-        if (upErr) {
-          toast.error("Nahrání obrázku selhalo", { description: upErr.message });
-          setSaving(false);
-          return;
-        }
-        uploadedUrls.push(
-          supabase.storage.from("product-images").getPublicUrl(path).data
-            .publicUrl,
-        );
+    for (const photo of photos) {
+      if (!photo.file) {
+        imageUrls.push(photo.url);
+        continue;
       }
+      const ext = photo.file.name.split(".").pop() ?? "jpg";
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("product-images")
+        .upload(path, photo.file, { upsert: false });
+
+      if (upErr) {
+        toast.error("Nahrání obrázku selhalo", { description: upErr.message });
+        setSaving(false);
+        return;
+      }
+      imageUrls.push(
+        supabase.storage.from("product-images").getPublicUrl(path).data
+          .publicUrl,
+      );
     }
 
     const finalSlug = slug || slugify(name);
@@ -172,7 +191,7 @@ export function ProductDialog({
       slug: finalSlug,
       description,
       material,
-      imageUrls: [...existingUrls, ...uploadedUrls],
+      imageUrls,
       basePriceCzk: Number(price) || 0,
       inStock,
       isActive: active,
@@ -319,38 +338,71 @@ export function ProductDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="p-image">Fotky (volitelné, první je titulní)</Label>
-              {previews.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {previews.map((url, i) => {
-                    const isExisting = i < existingUrls.length;
-                    return (
+              <Label htmlFor="p-image">Fotky (volitelné)</Label>
+              {photos.length > 0 && (
+                <>
+                  <p className="text-muted-foreground text-xs">
+                    Pořadí měníš šipkami nebo přetažením. Fotka č. 1 je titulní.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {photos.map((photo, i) => (
                       <div
-                        key={url}
-                        className="border-border/60 relative size-16 shrink-0 overflow-hidden rounded-md border"
+                        key={photo.key}
+                        draggable
+                        onDragStart={() => (dragFrom.current = i)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          if (dragFrom.current !== null) movePhoto(dragFrom.current, i);
+                          dragFrom.current = null;
+                        }}
+                        className={cn(
+                          "relative size-24 shrink-0 cursor-grab overflow-hidden rounded-md border active:cursor-grabbing",
+                          i === 0 ? "border-ice-blue border-2" : "border-border/60",
+                        )}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={url}
+                          src={photo.url}
                           alt=""
+                          draggable={false}
                           className="size-full object-cover"
                         />
+                        <span className="absolute top-1 left-1 rounded bg-black/75 px-1.5 text-[11px] font-semibold text-white">
+                          {i === 0 ? "1 · titulní" : i + 1}
+                        </span>
                         <button
                           type="button"
-                          onClick={() =>
-                            isExisting
-                              ? removeExisting(url)
-                              : removeNewFile(i - existingUrls.length)
-                          }
+                          onClick={() => removePhoto(photo.key)}
                           aria-label="Odebrat fotku"
-                          className="absolute top-0.5 right-0.5 rounded-full bg-black/70 p-0.5 text-white"
+                          className="absolute top-1 right-1 rounded-full bg-black/75 p-0.5 text-white"
                         >
                           <X className="size-3" />
                         </button>
+                        <div className="absolute inset-x-1 bottom-1 flex justify-between">
+                          <button
+                            type="button"
+                            onClick={() => movePhoto(i, i - 1)}
+                            disabled={i === 0}
+                            aria-label="Posunout dopředu"
+                            className="rounded-full bg-black/75 p-0.5 text-white disabled:opacity-0"
+                          >
+                            <ChevronLeft className="size-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => movePhoto(i, i + 1)}
+                            disabled={i === photos.length - 1}
+                            aria-label="Posunout dozadu"
+                            className="rounded-full bg-black/75 p-0.5 text-white disabled:opacity-0"
+                          >
+                            <ChevronRight className="size-3.5" />
+                          </button>
+                        </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    ))}
+                  </div>
+                </>
               )}
               <Button
                 type="button"
@@ -369,8 +421,7 @@ export function ProductDialog({
                 multiple
                 className="hidden"
                 onChange={(e) => {
-                  const picked = Array.from(e.target.files ?? []);
-                  setNewFiles((f) => [...f, ...picked]);
+                  addFiles(Array.from(e.target.files ?? []));
                   e.target.value = "";
                 }}
               />
