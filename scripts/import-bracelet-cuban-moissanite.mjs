@@ -3,10 +3,11 @@
  * product with per-product options (Délka only — no color variant, all
  * photos are the same silver/white-gold finish).
  *
- * Prices: supplier price x 2.0, rounded to steps of 300 CZK.
- * 15 cm 3 600 Kč ... 21,5 cm 5 100 Kč. `price_modifier` is in haléře,
- * relative to the 15 cm base price. Inserted as is_active = false —
- * activate from /admin/products when told to.
+ * Prices: 15 cm base at supplier price x 2.0 (3 600 Kč); each longer length
+ * adds a flat 230 Kč step (smaller margin on the extra material itself,
+ * full margin stays on the base). `price_modifier` is in haléře, relative
+ * to the 15 cm base price. Inserted as is_active = false — activate from
+ * /admin/products when told to.
  *
  * Requires migrations 0011_product_options.sql and 0012_product_material.sql.
  *
@@ -74,11 +75,11 @@ const PRODUCT = {
 
 const OPTIONS = [
   { group_name: "Délka", label: "15 cm", price_modifier: 0 },
-  { group_name: "Délka", label: "16,5 cm", price_modifier: 30000 },
-  { group_name: "Délka", label: "18 cm", price_modifier: 60000 },
-  { group_name: "Délka", label: "19 cm", price_modifier: 90000 },
-  { group_name: "Délka", label: "20,5 cm", price_modifier: 120000 },
-  { group_name: "Délka", label: "21,5 cm", price_modifier: 150000 },
+  { group_name: "Délka", label: "16,5 cm", price_modifier: 23000 },
+  { group_name: "Délka", label: "18 cm", price_modifier: 46000 },
+  { group_name: "Délka", label: "19 cm", price_modifier: 69000 },
+  { group_name: "Délka", label: "20,5 cm", price_modifier: 92000 },
+  { group_name: "Délka", label: "21,5 cm", price_modifier: 115000 },
 ];
 
 const { data: existing } = await supabase
