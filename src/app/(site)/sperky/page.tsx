@@ -66,10 +66,8 @@ export default async function SperkyPage({
         </p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {products.map((product, i) => (
-            <Reveal key={product.id} delay={i * 0.05}>
-              <ProductCard product={product} />
-            </Reveal>
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}

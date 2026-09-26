@@ -9,6 +9,7 @@ import { useCart } from "@/lib/cart-context";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useProductImage } from "@/components/product-image-context";
 
 type Props = {
   productSlug: string | null;
@@ -38,14 +39,35 @@ export function ProductVariants({
   const { addItem } = useCart();
   const groupNames = Object.keys(optionsByGroup);
 
+  const { activeUrl, setActiveUrl } = useProductImage();
+
   const [selected, setSelected] = useState<Record<string, string>>(() =>
     Object.fromEntries(
       groupNames.map((g) => [g, optionsByGroup[g][0].id]),
     ),
   );
 
+  // Clicking a gallery thumbnail that is some option's photo (e.g. the green
+  // bracelet) selects that option too, so the cart matches what's on screen.
+  // Adjusted during render rather than in an effect, per React's guidance.
+  const [syncedUrl, setSyncedUrl] = useState(activeUrl);
+  if (activeUrl !== syncedUrl) {
+    setSyncedUrl(activeUrl);
+    const next = { ...selected };
+    let changed = false;
+    for (const g of groupNames) {
+      const match = optionsByGroup[g].find((o) => o.image_url === activeUrl);
+      if (match && next[g] !== match.id) {
+        next[g] = match.id;
+        changed = true;
+      }
+    }
+    if (changed) setSelected(next);
+  }
+
   function selectOption(group: string, option: ProductOptionRow) {
     setSelected((s) => ({ ...s, [group]: option.id }));
+    if (option.image_url) setActiveUrl(option.image_url);
   }
 
   const selectedRows = useMemo(
@@ -88,18 +110,6 @@ export function ProductVariants({
 
   return (
     <div className="space-y-6">
-      {previewUrl && previewUrl !== imageUrl && (
-        <div className="from-onyx-surface to-onyx relative aspect-square w-full max-w-xs overflow-hidden rounded-xl bg-gradient-to-br">
-          <Image
-            src={previewUrl}
-            alt={productName}
-            fill
-            sizes="320px"
-            className="object-cover"
-          />
-        </div>
-      )}
-
       {groupNames.map((group) => {
         const opts = optionsByGroup[group];
         // Only show a price per option when this group actually changes the

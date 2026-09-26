@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/format";
 import { PRODUCT_CATEGORY_LABELS } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { ProductGallery } from "@/components/product-gallery";
+import { ProductImageProvider } from "@/components/product-image-context";
 import { ProductVariants } from "@/components/product-variants";
 import { SimpleOrderButton } from "@/components/simple-order-button";
 
@@ -56,59 +57,61 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-        <div className="relative">
-          <ProductGallery images={product.imageUrls} alt={product.name} />
-          {!product.inStock && (
-            <Badge variant="secondary" className="absolute top-4 left-4">
-              Vyprodáno
-            </Badge>
-          )}
-        </div>
-
-        <div>
-          <h1 className="font-heading text-3xl font-bold tracking-tight uppercase sm:text-4xl">
-            {product.name}
-          </h1>
-          <p className="text-ice mt-3 text-xl font-semibold">
-            {formatPrice(product.priceCzk)}
-          </p>
-          {product.material && (
-            <Badge variant="secondary" className="mt-3 gap-1.5">
-              <Gem className="size-3.5" />
-              {product.material}
-            </Badge>
-          )}
-          {product.description && (
-            <p className="text-muted-foreground mt-4 text-sm sm:text-base">
-              {product.description}
-            </p>
-          )}
-
-          <div className="mt-8">
-            {hasOptions ? (
-              <ProductVariants
-                productSlug={product.slug}
-                productName={product.name}
-                imageUrl={product.imageUrl}
-                basePriceCzk={product.priceCzk}
-                optionsByGroup={optionsByGroup}
-                inStock={product.inStock}
-                codAllowed={product.codAllowed}
-              />
-            ) : (
-              <SimpleOrderButton
-                productSlug={product.slug}
-                productName={product.name}
-                imageUrl={product.imageUrl}
-                priceCzk={product.priceCzk}
-                inStock={product.inStock}
-                codAllowed={product.codAllowed}
-              />
+      <ProductImageProvider initialUrl={product.imageUrls[0] ?? null}>
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="relative">
+            <ProductGallery images={product.imageUrls} alt={product.name} />
+            {!product.inStock && (
+              <Badge variant="secondary" className="absolute top-4 left-4">
+                Vyprodáno
+              </Badge>
             )}
           </div>
+
+          <div>
+            <h1 className="font-heading text-3xl font-bold tracking-tight uppercase sm:text-4xl">
+              {product.name}
+            </h1>
+            <p className="text-ice mt-3 text-xl font-semibold">
+              {formatPrice(product.priceCzk)}
+            </p>
+            {product.material && (
+              <Badge variant="secondary" className="mt-3 gap-1.5">
+                <Gem className="size-3.5" />
+                {product.material}
+              </Badge>
+            )}
+            {product.description && (
+              <p className="text-muted-foreground mt-4 text-sm sm:text-base">
+                {product.description}
+              </p>
+            )}
+
+            <div className="mt-8">
+              {hasOptions ? (
+                <ProductVariants
+                  productSlug={product.slug}
+                  productName={product.name}
+                  imageUrl={product.imageUrl}
+                  basePriceCzk={product.priceCzk}
+                  optionsByGroup={optionsByGroup}
+                  inStock={product.inStock}
+                  codAllowed={product.codAllowed}
+                />
+              ) : (
+                <SimpleOrderButton
+                  productSlug={product.slug}
+                  productName={product.name}
+                  imageUrl={product.imageUrl}
+                  priceCzk={product.priceCzk}
+                  inStock={product.inStock}
+                  codAllowed={product.codAllowed}
+                />
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </ProductImageProvider>
     </div>
   );
 }

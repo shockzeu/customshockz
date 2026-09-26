@@ -1,26 +1,30 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 
 import { cn } from "@/lib/utils";
+import { useProductImage } from "@/components/product-image-context";
 
 type Props = {
   images: string[];
   alt: string;
 };
 
-/** Product photo(s): a big preview plus a thumbnail row when there's more than one. */
+/**
+ * Product photo(s): a big preview plus a thumbnail row when there's more than one.
+ * The big photo is shared state, so picking a color below can switch it too.
+ */
 export function ProductGallery({ images, alt }: Props) {
-  const [active, setActive] = useState(0);
-  const current = images[active];
+  const { activeUrl, setActiveUrl } = useProductImage();
+  const current = activeUrl ?? images[0];
 
   return (
     <div>
       <div className="from-onyx-surface to-onyx relative aspect-square w-full overflow-hidden rounded-xl bg-gradient-to-br">
         {current ? (
+          // No `key` on purpose: swapping `src` on the same <img> keeps the old
+          // photo on screen until the new one has loaded, instead of flashing empty.
           <Image
-            key={current}
             src={current}
             alt={alt}
             fill
@@ -46,11 +50,11 @@ export function ProductGallery({ images, alt }: Props) {
             <button
               key={url}
               type="button"
-              onClick={() => setActive(i)}
+              onClick={() => setActiveUrl(url)}
               aria-label={`Fotka ${i + 1}`}
               className={cn(
                 "relative size-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors",
-                i === active
+                url === current
                   ? "border-ice-blue"
                   : "border-border/60 hover:border-border",
               )}
