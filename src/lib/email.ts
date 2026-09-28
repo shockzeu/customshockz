@@ -101,12 +101,14 @@ export async function sendOrderEmails(input: OrderEmailInput) {
     resend.emails.send({
       from: env.emailFrom,
       to: input.email,
+      replyTo: siteConfig.email,
       subject: "Potvrzení objednávky — CustomShockz",
       html: customerHtml,
     }),
     resend.emails.send({
       from: env.emailFrom,
       to: siteConfig.email,
+      replyTo: input.email,
       subject: `Nová objednávka č. ${input.orderNumber} od ${input.customerName}`,
       html: adminHtml,
     }),

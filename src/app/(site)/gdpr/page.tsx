@@ -22,9 +22,9 @@ export default function GdprPage() {
         <section>
           <h2 className="text-ice text-lg font-semibold">Správce údajů</h2>
           <p className="mt-2">
-            Správcem osobních údajů je [Doplnit: obchodní jméno / jméno a
-            příjmení, IČO, sídlo]. V otázkách ochrany osobních údajů nás
-            kontaktuj na {siteConfig.email}.
+            Správcem osobních údajů je provozovatel e-shopu CustomShockz.
+            V otázkách ochrany osobních údajů nás kontaktuj na e-mailu{" "}
+            {siteConfig.email} nebo na telefonu {siteConfig.phone}.
           </p>
         </section>
 
@@ -34,9 +34,8 @@ export default function GdprPage() {
           </h2>
           <p className="mt-2">
             Při objednávce zpracováváme jméno, kontaktní e-mail, adresu
-            pro doručení a údaje o objednávce. Platební údaje
-            nezpracováváme ani neukládáme sami — platby zajišťuje externí
-            platební brána.
+            pro doručení a údaje o objednávce. Údaje o platebních kartách
+            nezpracováváme — platí se převodem na účet nebo na dobírku.
           </p>
         </section>
 

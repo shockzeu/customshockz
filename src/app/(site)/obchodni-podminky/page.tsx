@@ -24,9 +24,22 @@ export default function ObchodniPodminkyPage() {
             1. Provozovatel
           </h2>
           <p className="mt-2">
-            [Doplnit: obchodní jméno / jméno a příjmení, IČO, sídlo,
-            zápis v živnostenském/obchodním rejstříku]. Kontaktní e-mail:{" "}
-            {siteConfig.email}.
+            Provozovatelem e-shopu customshockz.eu je CustomShockz. Kontaktovat
+            nás můžeš na e-mailu{" "}
+            <a
+              href={`mailto:${siteConfig.email}`}
+              className="text-ice-blue underline underline-offset-2"
+            >
+              {siteConfig.email}
+            </a>{" "}
+            nebo na telefonu{" "}
+            <a
+              href={`tel:${siteConfig.phone.replace(/\s/g, "")}`}
+              className="text-ice-blue underline underline-offset-2"
+            >
+              {siteConfig.phone}
+            </a>
+            .
           </p>
         </section>
 

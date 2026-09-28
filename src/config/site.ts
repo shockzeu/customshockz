@@ -11,6 +11,7 @@ export const siteConfig = {
   instagram: "https://instagram.com/CustomShockz",
   instagramHandle: "@CustomShockz",
   email: "customshockzz@gmail.com",
+  phone: "+420 728 887 119",
   /** Bank transfer target — shown to customers who pick that payment method. */
   bankAccount: "112200621/5500",
   /**
