@@ -3,6 +3,7 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 
 import {
   ORDER_STATUSES,
@@ -11,8 +12,13 @@ import {
 } from "@/types";
 import type { OrderStatus } from "@/types";
 import { formatPrice } from "@/lib/format";
-import { updateOrderStatus } from "@/app/admin/(panel)/orders/actions";
+import {
+  deleteAllOrders,
+  deleteOrder,
+  updateOrderStatus,
+} from "@/app/admin/(panel)/orders/actions";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -47,6 +53,44 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
     });
   }
 
+  function onDelete(order: OrderWithItems) {
+    if (
+      !window.confirm(
+        `Trvale smazat objednávku #${order.order_number} (${order.customer_name})? Tohle se nedá vzít zpět.`,
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      const res = await deleteOrder(order.id);
+      if (res.error) {
+        toast.error("Smazání selhalo", { description: res.error });
+        return;
+      }
+      toast.success("Objednávka smazána");
+      router.refresh();
+    });
+  }
+
+  function onDeleteAll() {
+    if (
+      !window.confirm(
+        `Trvale smazat všech ${orders.length} objednávek a vynulovat tržby? Tohle se nedá vzít zpět.`,
+      )
+    ) {
+      return;
+    }
+    startTransition(async () => {
+      const res = await deleteAllOrders();
+      if (res.error) {
+        toast.error("Smazání selhalo", { description: res.error });
+        return;
+      }
+      toast.success("Všechny objednávky smazány, tržby vynulované");
+      router.refresh();
+    });
+  }
+
   if (orders.length === 0) {
     return (
       <Card>
@@ -59,6 +103,20 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="text-destructive hover:text-destructive"
+          disabled={pending}
+          onClick={onDeleteAll}
+        >
+          <Trash2 className="size-4" />
+          Smazat všechny objednávky (reset tržeb)
+        </Button>
+      </div>
+
       {orders.map((order) => (
         <Card key={order.id}>
           <CardContent className="space-y-4 py-5">
@@ -105,6 +163,17 @@ export function OrdersList({ orders }: { orders: OrderWithItems[] }) {
                     ))}
                   </SelectContent>
                 </Select>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-destructive h-8"
+                  disabled={pending}
+                  onClick={() => onDelete(order)}
+                >
+                  <Trash2 className="size-3.5" />
+                  Smazat
+                </Button>
               </div>
             </div>
 
