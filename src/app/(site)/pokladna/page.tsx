@@ -70,9 +70,12 @@ export default function PokladnaPage() {
       return;
     }
 
-    clear();
-    const params = new URLSearchParams({ platba: effectivePaymentMethod });
+    const params = new URLSearchParams({
+      platba: effectivePaymentMethod,
+      castka: String(totalCzk),
+    });
     if (res.orderNumber) params.set("cislo", String(res.orderNumber));
+    clear();
     router.push(`/objednavka-dokoncena?${params.toString()}`);
   }
 
@@ -209,9 +212,9 @@ export default function PokladnaPage() {
                     <span className="text-foreground font-medium">
                       {siteConfig.bankAccount}
                     </span>
-                    . Variabilní symbol a přesnou částku pošleme e-mailem hned
-                    po odeslání objednávky — zpracovávat ji začneme, jakmile
-                    platba dorazí.
+                    . Po odeslání objednávky dostaneš QR kód k naskenování v
+                    bankovní aplikaci — zpracovávat objednávku začneme,
+                    jakmile platba dorazí.
                   </motion.p>
                 ) : (
                   <motion.p

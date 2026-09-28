@@ -71,7 +71,11 @@ export async function sendOrderEmails(input: OrderEmailInput) {
       <p>Způsob platby: ${paymentLabel}</p>
       ${
         input.paymentMethod === "bank_transfer"
-          ? `<p>Číslo účtu: <strong>${siteConfig.bankAccount}</strong><br>
+          ? `<p style="text-align:center;margin-top:16px;">
+               <img src="${siteConfig.url}/api/qr-platba?castka=${input.totalCzk}&vs=${variableSymbol}" alt="QR platba" width="200" height="200" style="display:inline-block;" />
+               <br><span style="color:#888;font-size:12px;">Naskenuj v bankovní aplikaci</span>
+             </p>
+             <p>Číslo účtu: <strong>${siteConfig.bankAccount}</strong><br>
              Variabilní symbol: <strong>${variableSymbol}</strong><br>
              Částka: <strong>${formatPrice(input.totalCzk)}</strong></p>
              <p>Jakmile platba dorazí na účet, rovnou začneme objednávku zpracovávat.</p>`
